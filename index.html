@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>極速轉檔與 PDF 編排工作台 ｜ Local File Studio</title>
+  <meta name="description" content="100% 本機瀏覽器運算轉檔工具，支援 HEIC、JPG、PNG、WEBP 轉換與壓縮，以及 PDF 視覺化頁面拖曳編排、增頁、刪頁與瘦身。">
+
+  <!-- 離線核心函式庫 (本地 vendor 載入，零延遲且可離線使用) -->
+  <script src="vendor/pdf-lib.min.js"></script>
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/heic2any.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+  <script src="vendor/sortable.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0F172A;
+      --card-bg: #1E293B;
+      --card-border: #334155;
+      --accent: #38BDF8;
+      --accent-hover: #0EA5E9;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --danger: #EF4444;
+      --success: #10B981;
+      --warning: #F59E0B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 頂部導航列 */
+    header {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      font-size: 24px;
+      background: linear-gradient(135deg, #38BDF8, #818CF8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* 書籤提示小徽章 */
+    .bookmark-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #38BDF8;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .bookmark-pill:hover {
+      background: rgba(56, 189, 248, 0.22);
+    }
+
+    /* 分頁選單 */
+    .tabs-nav {
+      max-width: 1200px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* 主內容區 */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* 拖曳上傳卡片 */
+    .drop-zone {
+      border: 2px dashed #475569;
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      background: rgba(30, 41, 59, 0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .drop-zone-icon { font-size: 40px; margin-bottom: 12px; }
+    .drop-zone-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .drop-zone-desc { font-size: 13px; color: var(--text-muted); }
+    .file-input { display: none; }
+
+    /* 控制面板列 */
+    .ctrl-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+    }
+    .ctrl-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .ctrl-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    select, input[type="text"], input[type="number"], input[type="range"] {
+      background: #0F172A;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    select:focus, input:focus { border-color: var(--accent); }
+
+    /* 按鈕樣式 */
+    .btn {
+      background: var(--accent);
+      color: #0F172A;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-secondary {
+      background: #334155;
+      color: var(--text-main);
+    }
+    .btn-secondary:hover { background: #475569; }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.35); }
+    .btn-success { background: #10B981; color: #0F172A; }
+    .btn-success:hover { background: #059669; }
+
+    /* 圖片清單卡片 */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color 0.2s;
+    }
+    .item-card:hover { border-color: #475569; }
+    .item-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #0F172A;
+      flex-shrink: 0;
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      display: flex;
+      gap: 12px;
+    }
+    .tag {
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #334155;
+    }
+    .tag-heic { background: #F59E0B; color: #0F172A; }
+    .tag-success { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+
+    /* PDF 頁面縮圖網格 (可拖曳排序) */
+    .pdf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .page-card {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.2s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .page-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+    .page-card.sortable-ghost {
+      opacity: 0.4;
+      border-color: var(--accent);
+    }
+    .page-card.sortable-chosen {
+      cursor: grabbing;
+      border-color: #818CF8;
+    }
+    .page-preview {
+      width: 100%;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0B1120;
+      padding: 10px;
+      overflow: hidden;
+    }
+    .page-preview canvas {
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border-radius: 4px;
+    }
+    .page-card-footer {
+      padding: 8px 12px;
+      background: #1E293B;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--card-border);
+    }
+    .page-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .page-actions {
+      display: flex;
+      gap: 4px;
+    }
+    .icon-btn {
+      background: #334155;
+      border: none;
+      color: var(--text-main);
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .icon-btn:hover { background: #475569; }
+    .icon-btn.danger:hover { background: var(--danger); color: white; }
+
+    /* 處理中 Spinner */
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 頁尾 */
+    footer {
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+      padding: 18px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    /* 響應式 */
+    @media (max-width: 768px) {
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .ctrl-bar { flex-direction: column; align-items: stretch; }
+      .item-card { flex-wrap: wrap; }
+      .pdf-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .page-preview { height: 170px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部 Header -->
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h1>個人專用極速轉檔與 PDF 編排工作台</h1>
+          <p>100% 瀏覽器本機記憶體運算 ｜ 零上傳安全隱私 ｜ HEIC · 圖片壓縮 · PDF 視覺增刪</p>
+        </div>
+      </div>
+
+      <div class="bookmark-pill" onclick="showBookmarkTip()" title="點擊查看書籤設定方法">
+        ⭐ 按 <strong>Ctrl + D</strong> 加入書籤即點即用
+      </div>
+    </div>
+  </header>
+
+  <!-- 分頁切換選單 -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('tab_image')">
+      <span>🖼️</span> 圖片轉檔與大小調校 (HEIC/JPG/PNG)
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab_pdf_pages')">
+      <span>📑</span> PDF 視覺化頁面編排、增頁與刪頁
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab_pdf_compress')">
+      <span>🗜️</span> PDF 檔案大小瘦身壓縮
+    </button>
+  </div>
+
+  <main>
+    <!-- ======================================================= -->
+    <!-- 分頁 1：圖片轉檔與大小調校 (PNG / JPG / HEIC / WEBP) -->
+    <!-- ======================================================= -->
+    <div id="tab_image" class="tab-content active">
+      <!-- 拖曳區 -->
+      <div class="drop-zone" id="img_drop_zone" onclick="document.getElementById('img_file_input').click()">
+        <div class="drop-zone-icon">📷</div>
+        <div class="drop-zone-title">拖曳圖片到此處，或點擊選取檔案</div>
+        <div class="drop-zone-desc">支援 <strong>Apple HEIC/HEIF</strong>、PNG、JPG、JPEG、WEBP、BMP 格式（可單張或多張批次）</div>
+        <input type="file" id="img_file_input" class="file-input" multiple accept=".heic,.heif,.png,.jpg,.jpeg,.webp,.bmp">
+      </div>
+
+      <!-- 控制列 -->
+      <div class="ctrl-bar">
+        <div class="ctrl-group">
+          <label>目標輸出格式</label>
+          <select id="img_target_format">
+            <option value="image/jpeg" selected>JPG / JPEG</option>
+            <option value="image/png">PNG (無損透明)</option>
+            <option value="image/webp">WEBP (極致高壓縮率)</option>
+          </select>
+        </div>
+
+        <div class="ctrl-group" id="quality_group">
+          <label>壓縮品質 (<span id="img_quality_val">85%</span>)</label>
+          <input type="range" id="img_quality_slider" min="10" max="100" value="85" style="width: 140px;" oninput="document.getElementById('img_quality_val').textContent = this.value + '%'">
+        </div>
+
+        <div class="ctrl-group">
+          <label>解析度縮放 (寬度上限)</label>
+          <select id="img_resize_mode">
+            <option value="original" selected>保持原始解析度</option>
+            <option value="2560">2K QHD (最大寬 2560px)</option>
+            <option value="1920">Full HD (最大寬 1920px)</option>
+            <option value="1280">HD (最大寬 1280px)</option>
+            <option value="800">網頁小圖 (最大寬 800px)</option>
+            <option value="scale_75">等比例縮小 75%</option>
+            <option value="scale_50">等比例縮小 50%</option>
+          </select>
+        </div>
+
+        <div style="margin-left: auto; display: flex; gap: 10px;">
+          <button class="btn" id="btn_convert_all" onclick="processAllImages()" disabled>
+            ⚡ 開始轉檔與壓縮
+          </button>
+          <button class="btn btn-success" id="btn_zip_all" onclick="downloadAllZip()" style="display:none;">
+            📦 打包下載全部 (ZIP)
+          </button>
+          <button class="btn btn-secondary" onclick="clearImageList()">清空</button>
+        </div>
+      </div>
+
+      <!-- 圖片處理清單 -->
+      <div id="img_list" class="item-list"></div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- 分頁 2：PDF 視覺化頁面編排、增頁與刪頁 -->
+    <!-- ======================================================= -->
+    <div id="tab_pdf_pages" class="tab-content">
+      <div class="drop-zone" id="pdf_drop_zone" onclick="document.getElementById('pdf_file_input').click()">
+        <div class="drop-zone-icon">📑</div>
+        <div class="drop-zone-title">拖曳 PDF 檔案至此，或點擊選取</div>
+        <div class="drop-zone-desc">自動渲染每一頁縮圖，支援<strong>自由拖曳排序、增頁合併、刪頁、單頁旋轉</strong></div>
+        <input type="file" id="pdf_file_input" class="file-input" accept=".pdf">
+      </div>
+
+      <!-- PDF 工具控制列 -->
+      <div class="ctrl-bar" id="pdf_ctrl_bar" style="display:none;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span id="pdf_summary" style="font-size: 14px; font-weight: 600;">共 0 頁</span>
+          <span style="font-size: 12px; color: var(--text-muted);">💡 提示：按住頁面縮圖可直接以滑鼠拖曳變更前後順序</span>
+        </div>
+
+        <div style="margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap;">
+          <!-- 附加/新增其他 PDF 頁面 -->
+          <button class="btn btn-secondary" onclick="document.getElementById('pdf_append_input').click()">
+            ➕ 插入/追加其他 PDF
+          </button>
+          <input type="file" id="pdf_append_input" class="file-input" accept=".pdf" multiple onchange="appendPdfFiles(this.files)">
+
+          <button class="btn btn-secondary" onclick="rotateAllPages(90)">
+            🔄 全部順時針旋轉
+          </button>
+          <button class="btn btn-danger" onclick="resetPdfStudio()">
+            清空重來
+          </button>
+          <button class="btn btn-success" id="btn_export_pdf" onclick="exportEditedPdf()">
+            💾 匯出新編排 PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- PDF 縮圖排序網格容器 -->
+      <div id="pdf_pages_grid" class="pdf-grid"></div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- 分頁 3：PDF 檔案大小瘦身壓縮 -->
+    <!-- ======================================================= -->
+    <div id="tab_pdf_compress" class="tab-content">
+      <div class="drop-zone" id="pdf_compress_drop_zone" onclick="document.getElementById('pdf_compress_input').click()">
+        <div class="drop-zone-icon">🗜️</div>
+        <div class="drop-zone-title">拖曳要減小檔案體積的 PDF 檔案至此</div>
+        <div class="drop-zone-desc">重新採樣影像與重新壓縮，特別適用於手機掃描檔、大圖報表過大需要寄信時使用</div>
+        <input type="file" id="pdf_compress_input" class="file-input" accept=".pdf">
+      </div>
+
+      <div class="ctrl-bar" id="pdf_compress_ctrl" style="display:none;">
+        <div class="ctrl-group">
+          <label>壓縮目標設定</label>
+          <select id="pdf_compress_profile">
+            <option value="web" selected>📱 輕量網路版 (72-96 DPI, 品質 65%, 適合小於 2 MB Email)</option>
+            <option value="balanced">💻 螢幕閱讀版 (120 DPI, 品質 80%, 清晰與體積平衡)</option>
+            <option value="print">🖨️ 高解析版 (150 DPI, 品質 88%, 保留細節)</option>
+          </select>
+        </div>
+
+        <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+          <span id="compress_info" style="font-size: 13px; color: var(--text-muted);">原始大小: -</span>
+          <button class="btn" id="btn_start_pdf_compress" onclick="startPdfCompression()">
+            ⚡ 開始壓縮瘦身
+          </button>
+        </div>
+      </div>
+
+      <!-- 壓縮進度與結果 -->
+      <div id="compress_progress_box" style="display:none; margin-top: 20px;" class="item-card">
+        <div class="item-info">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span id="compress_status_text" style="font-size: 14px; font-weight: 600;">正在處理中...</span>
+            <span id="compress_percent_text" style="font-size: 14px; color: var(--accent);">0%</span>
+          </div>
+          <div style="width: 100%; height: 8px; background: #0F172A; border-radius: 4px; overflow: hidden;">
+            <div id="compress_progress_bar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.2s;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="compress_result_card" style="display:none; margin-top: 20px;" class="item-card">
+        <div style="font-size: 32px;">🎉</div>
+        <div class="item-info">
+          <div style="font-size: 16px; font-weight: 700;">壓縮完成！</div>
+          <div id="compress_stat_summary" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;"></div>
+        </div>
+        <a id="btn_download_compressed_pdf" class="btn btn-success" download="compressed.pdf">
+          💾 下載已瘦身 PDF
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>⚡ Local File Studio ｜ 100% 本地運算無資料上傳風險 ｜ 建議使用 Edge / Chrome 獲得最佳效能</p>
+  </footer>
+
+  <!-- ======================================================= -->
+  <!-- 核心邏輯 JavaScript -->
+  <!-- ======================================================= -->
+  <script>
+    // 1. 初始化 PDF.js Worker
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
+    }
+
+    // 2. 分頁切換
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function showBookmarkTip() {
+      alert("⭐ 加入書籤秘訣：\n\n1. 在當前視窗按下鍵盤快捷鍵「Ctrl + D」（Mac 請按 Cmd + D）。\n2. 點擊「完成」即可加入瀏覽器書籤列。\n3. 以後只要打開瀏覽器點擊該書籤，就能隨時一鍵即時打開使用！");
+    }
+
+    // =========================================================
+    // 模組一：圖片轉檔與大小壓縮 (PNG / JPG / HEIC / WEBP)
+    // =========================================================
+    let imageQueue = [];
+
+    const imgDropZone = document.getElementById('img_drop_zone');
+    const imgFileInput = document.getElementById('img_file_input');
+
+    ['dragenter', 'dragover'].forEach(name => {
+      imgDropZone.addEventListener(name, (e) => { e.preventDefault(); imgDropZone.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+      imgDropZone.addEventListener(name, (e) => { e.preventDefault(); imgDropZone.classList.remove('dragover'); });
+    });
+    imgDropZone.addEventListener('drop', (e) => {
+      handleImageFiles(e.dataTransfer.files);
+    });
+    imgFileInput.addEventListener('change', (e) => {
+      handleImageFiles(e.target.files);
+      imgFileInput.value = '';
+    });
+
+    async function handleImageFiles(files) {
+      if (!files || files.length === 0) return;
+
+      for (let file of files) {
+        const id = 'img_' + Math.random().toString(36).substr(2, 9);
+        const isHeic = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+
+        imageQueue.push({
+          id,
+          file,
+          name: file.name,
+          size: file.size,
+          isHeic,
+          status: 'ready', // ready, converting, done, error
+          convertedBlob: null,
+          convertedSize: 0,
+          previewUrl: isHeic ? '' : URL.createObjectURL(file)
+        });
+      }
+
+      renderImageList();
+      document.getElementById('btn_convert_all').disabled = false;
+    }
+
+    function renderImageList() {
+      const container = document.getElementById('img_list');
+      container.innerHTML = '';
+
+      imageQueue.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.id = 'card_' + item.id;
+
+        const thumbSrc = item.previewUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="%2394A3B8"><text x="5" y="30" font-size="12">HEIC</text></svg>';
+
+        let statusBadge = '';
+        if (item.status === 'ready') statusBadge = '<span class="tag">待處理</span>';
+        else if (item.status === 'converting') statusBadge = '<span class="tag tag-heic"><span class="spinner" style="display:inline-block;width:10px;height:10px;margin-right:4px;"></span>處理中</span>';
+        else if (item.status === 'done') statusBadge = `<span class="tag tag-success">已完成 (${formatSize(item.convertedSize)})</span>`;
+        else if (item.status === 'error') statusBadge = '<span class="tag" style="background:#EF4444;">失敗</span>';
+
+        card.innerHTML = `
+          <img src="${thumbSrc}" class="item-thumb" id="thumb_${item.id}">
+          <div class="item-info">
+            <div class="item-name">${escapeHtml(item.name)}</div>
+            <div class="item-meta">
+              <span>原始: ${formatSize(item.size)}</span>
+              ${item.isHeic ? '<span class="tag tag-heic">Apple HEIC</span>' : ''}
+              ${statusBadge}
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            ${item.convertedBlob ? `<button class="btn btn-secondary" onclick="downloadSingleImage('${item.id}')">💾 下載</button>` : ''}
+            <button class="icon-btn danger" onclick="removeImage('${item.id}')" title="移除">✕</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function removeImage(id) {
+      imageQueue = imageQueue.filter(item => item.id !== id);
+      renderImageList();
+      if (imageQueue.length === 0) {
+        document.getElementById('btn_convert_all').disabled = true;
+        document.getElementById('btn_zip_all').style.display = 'none';
+      }
+    }
+
+    function clearImageList() {
+      imageQueue = [];
+      renderImageList();
+      document.getElementById('btn_convert_all').disabled = true;
+      document.getElementById('btn_zip_all').style.display = 'none';
+    }
+
+    async function processAllImages() {
+      const targetMime = document.getElementById('img_target_format').value;
+      const quality = parseInt(document.getElementById('img_quality_slider').value) / 100.0;
+      const resizeMode = document.getElementById('img_resize_mode').value;
+      const convertBtn = document.getElementById('btn_convert_all');
+
+      convertBtn.disabled = true;
+      convertBtn.textContent = '轉檔中...';
+
+      for (let item of imageQueue) {
+        if (item.status === 'done') continue;
+        item.status = 'converting';
+        renderImageList();
+
+        try {
+          let sourceBlob = item.file;
+
+          // 1. 若是 Apple HEIC，呼叫 heic2any 轉為標準 Blob
+          if (item.isHeic) {
+            sourceBlob = await heic2any({
+              blob: item.file,
+              toType: 'image/jpeg',
+              quality: 0.95
+            });
+            if (Array.isArray(sourceBlob)) sourceBlob = sourceBlob[0];
+          }
+
+          // 2. 透過 Canvas 調校尺寸與壓縮品質
+          const convertedBlob = await convertAndCompressImageBlob(sourceBlob, targetMime, quality, resizeMode);
+
+          item.convertedBlob = convertedBlob;
+          item.convertedSize = convertedBlob.size;
+          item.previewUrl = URL.createObjectURL(convertedBlob);
+          item.status = 'done';
+        } catch (err) {
+          console.error('轉檔失敗:', item.name, err);
+          item.status = 'error';
+        }
+
+        renderImageList();
+      }
+
+      convertBtn.disabled = false;
+      convertBtn.textContent = '⚡ 開始轉檔與壓縮';
+
+      const hasDone = imageQueue.some(i => i.status === 'done');
+      if (hasDone) {
+        document.getElementById('btn_zip_all').style.display = 'inline-flex';
+      }
+    }
+
+    function convertAndCompressImageBlob(blob, targetMime, quality, resizeMode) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let w = img.width;
+          let h = img.height;
+
+          // 尺寸調整
+          if (resizeMode === 'scale_75') { w = Math.round(w * 0.75); h = Math.round(h * 0.75); }
+          else if (resizeMode === 'scale_50') { w = Math.round(w * 0.5); h = Math.round(h * 0.5); }
+          else if (resizeMode !== 'original') {
+            const maxW = parseInt(resizeMode);
+            if (w > maxW) {
+              h = Math.round((h * maxW) / w);
+              w = maxW;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+
+          // 若目標為 JPEG，先填白色背景避免 PNG 透明變黑
+          if (targetMime === 'image/jpeg') {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+          }
+
+          ctx.drawImage(img, 0, 0, w, h);
+
+          canvas.toBlob((outBlob) => {
+            if (outBlob) resolve(outBlob);
+            else reject(new Error('Canvas 轉檔失敗'));
+          }, targetMime, quality);
+        };
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    function downloadSingleImage(id) {
+      const item = imageQueue.find(i => i.id === id);
+      if (!item || !item.convertedBlob) return;
+
+      const ext = document.getElementById('img_target_format').value.split('/')[1].replace('jpeg', 'jpg');
+      const baseName = item.name.substring(0, item.name.lastIndexOf('.')) || item.name;
+      const downloadName = `${baseName}_converted.${ext}`;
+
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(item.convertedBlob);
+      a.download = downloadName;
+      a.click();
+    }
+
+    async function downloadAllZip() {
+      const zip = new JSZip();
+      const ext = document.getElementById('img_target_format').value.split('/')[1].replace('jpeg', 'jpg');
+
+      imageQueue.forEach((item, index) => {
+        if (item.convertedBlob) {
+          const baseName = item.name.substring(0, item.name.lastIndexOf('.')) || item.name;
+          zip.file(`${baseName}_${index + 1}.${ext}`, item.convertedBlob);
+        }
+      });
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(zipBlob);
+      a.download = `Converted_Images_${new Date().toISOString().slice(0,10)}.zip`;
+      a.click();
+    }
+
+
+    // =========================================================
+    // 模組二：PDF 視覺化頁面編排、增頁與刪頁
+    // =========================================================
+    let pdfPagesList = []; // 儲存 { id, srcPdfBytes, pageIndex, rotation, canvasThumb }
+    let sortableInstance = null;
+
+    const pdfDropZone = document.getElementById('pdf_drop_zone');
+    const pdfFileInput = document.getElementById('pdf_file_input');
+
+    ['dragenter', 'dragover'].forEach(name => {
+      pdfDropZone.addEventListener(name, (e) => { e.preventDefault(); pdfDropZone.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+      pdfDropZone.addEventListener(name, (e) => { e.preventDefault(); pdfDropZone.classList.remove('dragover'); });
+    });
+    pdfDropZone.addEventListener('drop', (e) => {
+      if (e.dataTransfer.files.length > 0) loadInitialPdf(e.dataTransfer.files[0]);
+    });
+    pdfFileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) loadInitialPdf(e.target.files[0]);
+      pdfFileInput.value = '';
+    });
+
+    async function loadInitialPdf(file) {
+      pdfPagesList = [];
+      await appendPdfFile(file);
+      document.getElementById('pdf_ctrl_bar').style.display = 'flex';
+      initSortable();
+    }
+
+    async function appendPdfFiles(files) {
+      for (let file of files) {
+        await appendPdfFile(file);
+      }
+      document.getElementById('pdf_append_input').value = '';
+    }
+
+    async function appendPdfFile(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfBytes = new Uint8Array(arrayBuffer);
+
+      // 使用 PDF.js 渲染縮圖
+      const pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.slice() }).promise;
+      const numPages = pdfDoc.numPages;
+
+      for (let i = 1; i <= numPages; i++) {
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale: 0.35 });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+        pdfPagesList.push({
+          id: 'page_' + Math.random().toString(36).substr(2, 9),
+          srcPdfBytes: pdfBytes,
+          pageIndex: i - 1, // 0-based
+          rotation: 0,
+          canvasThumb: canvas,
+          sourceFileName: file.name
+        });
+      }
+
+      renderPdfGrid();
+    }
+
+    function initSortable() {
+      const grid = document.getElementById('pdf_pages_grid');
+      if (sortableInstance) sortableInstance.destroy();
+
+      sortableInstance = new Sortable(grid, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        onEnd: (evt) => {
+          const item = pdfPagesList.splice(evt.oldIndex, 1)[0];
+          pdfPagesList.splice(evt.newIndex, 0, item);
+          updatePageNumbers();
+        }
+      });
+    }
+
+    function renderPdfGrid() {
+      const grid = document.getElementById('pdf_pages_grid');
+      grid.innerHTML = '';
+
+      pdfPagesList.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = 'page-card';
+        card.id = p.id;
+
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'page-preview';
+        p.canvasThumb.style.transform = `rotate(${p.rotation}deg)`;
+        p.canvasThumb.style.transition = 'transform 0.2s';
+        previewDiv.appendChild(p.canvasThumb);
+
+        const footer = document.createElement('div');
+        footer.className = 'page-card-footer';
+        footer.innerHTML = `
+          <span class="page-num" id="pnum_${p.id}">#${idx + 1}</span>
+          <div class="page-actions">
+            <button class="icon-btn" onclick="rotatePage('${p.id}', 90)" title="順時針旋轉 90°">🔄</button>
+            <button class="icon-btn danger" onclick="deletePage('${p.id}')" title="刪除此頁">🗑️</button>
+          </div>
+        `;
+
+        card.appendChild(previewDiv);
+        card.appendChild(footer);
+        grid.appendChild(card);
+      });
+
+      updatePageNumbers();
+    }
+
+    function updatePageNumbers() {
+      pdfPagesList.forEach((p, idx) => {
+        const el = document.getElementById(`pnum_${p.id}`);
+        if (el) el.textContent = `#${idx + 1}`;
+      });
+      document.getElementById('pdf_summary').textContent = `目前共 ${pdfPagesList.length} 頁`;
+    }
+
+    function rotatePage(id, angle) {
+      const p = pdfPagesList.find(item => item.id === id);
+      if (!p) return;
+      p.rotation = (p.rotation + angle) % 360;
+      p.canvasThumb.style.transform = `rotate(${p.rotation}deg)`;
+    }
+
+    function rotateAllPages(angle) {
+      pdfPagesList.forEach(p => {
+        p.rotation = (p.rotation + angle) % 360;
+        p.canvasThumb.style.transform = `rotate(${p.rotation}deg)`;
+      });
+    }
+
+    function deletePage(id) {
+      pdfPagesList = pdfPagesList.filter(p => p.id !== id);
+      const card = document.getElementById(id);
+      if (card) card.remove();
+      updatePageNumbers();
+
+      if (pdfPagesList.length === 0) {
+        document.getElementById('pdf_ctrl_bar').style.display = 'none';
+      }
+    }
+
+    function resetPdfStudio() {
+      pdfPagesList = [];
+      document.getElementById('pdf_pages_grid').innerHTML = '';
+      document.getElementById('pdf_ctrl_bar').style.display = 'none';
+    }
+
+    async function exportEditedPdf() {
+      if (pdfPagesList.length === 0) return alert('目前沒有任何頁面可匯出！');
+
+      const btn = document.getElementById('btn_export_pdf');
+      btn.disabled = true;
+      btn.textContent = '匯出編排中...';
+
+      try {
+        const outPdf = await PDFLib.PDFDocument.create();
+
+        // 快取以載入的 srcPdfBytes
+        const docCache = new Map();
+
+        for (let p of pdfPagesList) {
+          let srcDoc = docCache.get(p.srcPdfBytes);
+          if (!srcDoc) {
+            srcDoc = await PDFLib.PDFDocument.load(p.srcPdfBytes);
+            docCache.set(p.srcPdfBytes, srcDoc);
+          }
+
+          const [copiedPage] = await outPdf.copyPages(srcDoc, [p.pageIndex]);
+          if (p.rotation !== 0) {
+            const currentRot = copiedPage.getRotation().angle;
+            copiedPage.setRotation(PDFLib.degrees((currentRot + p.rotation) % 360));
+          }
+          outPdf.addPage(copiedPage);
+        }
+
+        const outBytes = await outPdf.save();
+        const blob = new Blob([outBytes], { type: 'application/pdf' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Reordered_Document_${new Date().toISOString().slice(0,10)}.pdf`;
+        a.click();
+      } catch (err) {
+        console.error('PDF 匯出失敗:', err);
+        alert('匯出失敗: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 匯出新編排 PDF';
+      }
+    }
+
+
+    // =========================================================
+    // 模組三：PDF 檔案體積壓縮 (PDF Compressor)
+    // =========================================================
+    let targetCompressFile = null;
+
+    const compressDropZone = document.getElementById('pdf_compress_drop_zone');
+    const compressInput = document.getElementById('pdf_compress_input');
+
+    ['dragenter', 'dragover'].forEach(name => {
+      compressDropZone.addEventListener(name, (e) => { e.preventDefault(); compressDropZone.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+      compressDropZone.addEventListener(name, (e) => { e.preventDefault(); compressDropZone.classList.remove('dragover'); });
+    });
+    compressDropZone.addEventListener('drop', (e) => {
+      if (e.dataTransfer.files.length > 0) loadCompressPdf(e.dataTransfer.files[0]);
+    });
+    compressInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) loadCompressPdf(e.target.files[0]);
+      compressInput.value = '';
+    });
+
+    function loadCompressPdf(file) {
+      targetCompressFile = file;
+      document.getElementById('pdf_compress_ctrl').style.display = 'flex';
+      document.getElementById('compress_info').textContent = `檔案: ${file.name} ｜ 原始大小: ${formatSize(file.size)}`;
+      document.getElementById('compress_result_card').style.display = 'none';
+      document.getElementById('compress_progress_box').style.display = 'none';
+    }
+
+    async function startPdfCompression() {
+      if (!targetCompressFile) return;
+
+      const profile = document.getElementById('pdf_compress_profile').value;
+      let dpiScale = 1.0;
+      let imgQuality = 0.65;
+
+      if (profile === 'web') { dpiScale = 0.9; imgQuality = 0.60; }
+      else if (profile === 'balanced') { dpiScale = 1.25; imgQuality = 0.78; }
+      else if (profile === 'print') { dpiScale = 1.6; imgQuality = 0.88; }
+
+      const progressBox = document.getElementById('compress_progress_box');
+      const progressBar = document.getElementById('compress_progress_bar');
+      const percentText = document.getElementById('compress_percent_text');
+      const statusText = document.getElementById('compress_status_text');
+      const startBtn = document.getElementById('btn_start_pdf_compress');
+
+      progressBox.style.display = 'flex';
+      startBtn.disabled = true;
+
+      try {
+        const arrayBuf = await targetCompressFile.arrayBuffer();
+        const pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuf) }).promise;
+        const totalPages = pdfDoc.numPages;
+
+        const outPdf = await PDFLib.PDFDocument.create();
+
+        for (let i = 1; i <= totalPages; i++) {
+          const pct = Math.round((i / totalPages) * 100);
+          progressBar.style.width = pct + '%';
+          percentText.textContent = pct + '%';
+          statusText.textContent = `正在重新渲染並壓縮第 ${i} / ${totalPages} 頁...`;
+
+          const page = await pdfDoc.getPage(i);
+          const viewport = page.getViewport({ scale: dpiScale });
+
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+          // 導出高壓縮 JPEG
+          const jpegDataUrl = canvas.toDataURL('image/jpeg', imgQuality);
+          const jpegBytes = dataUrlToUint8Array(jpegDataUrl);
+
+          const embeddedImg = await outPdf.embedJpg(jpegBytes);
+          const origViewport = page.getViewport({ scale: 1.0 });
+
+          // 建立與原頁面相同點數長寬的 PDF 頁
+          const newPage = outPdf.addPage([origViewport.width, origViewport.height]);
+          newPage.drawImage(embeddedImg, {
+            x: 0,
+            y: 0,
+            width: origViewport.width,
+            height: origViewport.height
+          });
+        }
+
+        statusText.textContent = '封裝已瘦身 PDF 檔案中...';
+        const compressedBytes = await outPdf.save();
+        const compressedBlob = new Blob([compressedBytes], { type: 'application/pdf' });
+
+        const origSize = targetCompressFile.size;
+        const newSize = compressedBlob.size;
+        const ratio = Math.round(((origSize - newSize) / origSize) * 100);
+
+        document.getElementById('compress_result_card').style.display = 'flex';
+        document.getElementById('compress_stat_summary').innerHTML = `
+          原始大小: <strong>${formatSize(origSize)}</strong> ➔ 瘦身後: <strong>${formatSize(newSize)}</strong> 
+          <span class="tag tag-success" style="margin-left:8px;">節省 ${ratio > 0 ? ratio : 0}%</span>
+        `;
+
+        const downloadBtn = document.getElementById('btn_download_compressed_pdf');
+        downloadBtn.href = URL.createObjectURL(compressedBlob);
+        downloadBtn.download = `Compressed_${targetCompressFile.name}`;
+
+      } catch (err) {
+        console.error('PDF 壓縮失敗:', err);
+        alert('壓縮失敗: ' + err.message);
+      } finally {
+        startBtn.disabled = false;
+        progressBox.style.display = 'none';
+      }
+    }
+
+
+    // =========================================================
+    // 工具函式
+    // =========================================================
+    function formatSize(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function dataUrlToUint8Array(dataUrl) {
+      const base64 = dataUrl.split(',')[1];
+      const binary = atob(base64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes;
+    }
+  </script>
+</body>
+</html>
