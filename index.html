@@ -1,1170 +1,3611 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>極速轉檔與 PDF 編排工作台 ｜ Local File Studio</title>
-  <meta name="description" content="100% 本機瀏覽器運算轉檔工具，支援 HEIC、JPG、PNG、WEBP 轉換與壓縮，以及 PDF 視覺化頁面拖曳編排、增頁、刪頁與瘦身。">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local File Studio Pro — 極速轉檔與 PDF 編排工作台</title>
+<script src="vendor/pdf-lib.min.js"></script>
+<script src="vendor/pdf.min.js"></script>
+<script src="vendor/heic2any.min.js"></script>
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/sortable.min.js"></script>
+<style>
+/* ==========================================================================
+   APPLE FLAGSHIP DESIGN SYSTEM — VISIONOS LIQUID GLASS & TITANIUM PRO
+   ========================================================================== */
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei UI", "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
-  <!-- 離線核心函式庫 (本地 vendor 載入，零延遲且可離線使用) -->
-  <script src="vendor/pdf-lib.min.js"></script>
-  <script src="vendor/pdf.min.js"></script>
-  <script src="vendor/heic2any.min.js"></script>
-  <script src="vendor/jszip.min.js"></script>
-  <script src="vendor/sortable.min.js"></script>
+  /* Dark Mode (Obsidian Titanium Pro) */
+  --bg-base: #000000;
+  --bg-elevated: #0d0d10;
+  --glass-bg: rgba(22, 22, 27, 0.56);
+  --glass-bg-strong: rgba(24, 24, 30, 0.82);
+  --glass-bg-hover: rgba(34, 34, 42, 0.68);
+  --glass-header: rgba(8, 8, 11, 0.68);
+  --glass-input: rgba(12, 12, 16, 0.55);
+  --glass-segment: rgba(255, 255, 255, 0.065);
+  --glass-segment-pill: rgba(255, 255, 255, 0.145);
 
-  <style>
-    :root {
-      --bg: #0F172A;
-      --card-bg: #1E293B;
-      --card-border: #334155;
-      --accent: #38BDF8;
-      --accent-hover: #0EA5E9;
-      --accent-glow: rgba(56, 189, 248, 0.25);
-      --text-main: #F8FAFC;
-      --text-muted: #94A3B8;
-      --danger: #EF4444;
-      --success: #10B981;
-      --warning: #F59E0B;
-    }
+  --border-hairline: rgba(255, 255, 255, 0.095);
+  --border-subtle: rgba(255, 255, 255, 0.145);
+  --border-hover: rgba(255, 255, 255, 0.26);
+  --specular-top: rgba(255, 255, 255, 0.22);
+  --specular-bottom: rgba(0, 0, 0, 0.35);
+  --spotlight-surface: rgba(255, 255, 255, 0.065);
+  --spotlight-rim: rgba(120, 195, 255, 0.55);
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  --text-1: #f5f5f7;
+  --text-2: #a1a1a6;
+  --text-3: #6e6e73;
 
-    /* 頂部導航列 */
-    header {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    .header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 14px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .brand-icon {
-      font-size: 24px;
-      background: linear-gradient(135deg, #38BDF8, #818CF8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .brand-text h1 {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-    .brand-text p {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
+  --apple-blue: #2997ff;
+  --apple-blue-btn: #0071e3;
+  --apple-blue-btn-hover: #0a84ff;
+  --apple-blue-soft: rgba(41, 151, 255, 0.15);
+  --apple-blue-glow: rgba(0, 113, 227, 0.42);
 
-    /* 書籤提示小徽章 */
-    .bookmark-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      color: #38BDF8;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .bookmark-pill:hover {
-      background: rgba(56, 189, 248, 0.22);
-    }
+  --apple-indigo: #5e5ce6;
+  --apple-purple: #bf5af2;
+  --apple-teal: #64d2ff;
 
-    /* 分頁選單 */
-    .tabs-nav {
-      max-width: 1200px;
-      margin: 20px auto 0;
-      padding: 0 20px;
-      display: flex;
-      gap: 8px;
-      border-bottom: 1px solid var(--card-border);
-    }
-    .tab-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      padding: 12px 18px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s;
-    }
-    .tab-btn:hover {
-      color: var(--text-main);
-    }
-    .tab-btn.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
+  --apple-green: #30d158;
+  --apple-green-btn: #28cd41;
+  --apple-green-soft: rgba(48, 209, 88, 0.14);
 
-    /* 主內容區 */
-    main {
-      flex: 1;
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 24px 20px;
-    }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+  --apple-orange: #ff9f0a;
+  --apple-orange-soft: rgba(255, 159, 10, 0.15);
 
-    /* 拖曳上傳卡片 */
-    .drop-zone {
-      border: 2px dashed #475569;
-      border-radius: 16px;
-      padding: 40px 20px;
-      text-align: center;
-      background: rgba(30, 41, 59, 0.5);
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.08);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .drop-zone-icon { font-size: 40px; margin-bottom: 12px; }
-    .drop-zone-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-    .drop-zone-desc { font-size: 13px; color: var(--text-muted); }
-    .file-input { display: none; }
+  --apple-red: #ff453a;
+  --apple-red-soft: rgba(255, 69, 58, 0.14);
 
-    /* 控制面板列 */
-    .ctrl-bar {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 16px 20px;
-      margin: 20px 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 16px;
-    }
-    .ctrl-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .ctrl-group label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-    select, input[type="text"], input[type="number"], input[type="range"] {
-      background: #0F172A;
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    select:focus, input:focus { border-color: var(--accent); }
+  --hero-grad: linear-gradient(110deg, #ffffff 0%, #e5e5ea 38%, #8ec8ff 52%, #ffffff 66%, #a1a1a6 100%);
 
-    /* 按鈕樣式 */
-    .btn {
-      background: var(--accent);
-      color: #0F172A;
-      border: none;
-      padding: 9px 18px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
-    .btn-secondary {
-      background: #334155;
-      color: var(--text-main);
-    }
-    .btn-secondary:hover { background: #475569; }
-    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .btn-danger:hover { background: rgba(239, 68, 68, 0.35); }
-    .btn-success { background: #10B981; color: #0F172A; }
-    .btn-success:hover { background: #059669; }
+  --shadow-card:
+    0 24px 60px rgba(0, 0, 0, 0.58),
+    0 4px 16px rgba(0, 0, 0, 0.36);
+  --shadow-float:
+    0 36px 90px rgba(0, 0, 0, 0.82),
+    0 0 0 1px rgba(255, 255, 255, 0.13);
+  --shadow-pill:
+    0 4px 18px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
-    /* 圖片清單卡片 */
-    .item-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .item-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      transition: border-color 0.2s;
-    }
-    .item-card:hover { border-color: #475569; }
-    .item-thumb {
-      width: 52px;
-      height: 52px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: #0F172A;
-      flex-shrink: 0;
-    }
-    .item-info { flex: 1; min-width: 0; }
-    .item-name {
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .item-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 3px;
-      display: flex;
-      gap: 12px;
-    }
-    .tag {
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      background: #334155;
-    }
-    .tag-heic { background: #F59E0B; color: #0F172A; }
-    .tag-success { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+  --radius-sm: 11px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 
-    /* PDF 頁面縮圖網格 (可拖曳排序) */
-    .pdf-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-    .page-card {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: grab;
-      user-select: none;
-      transition: all 0.2s;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-    .page-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-    }
-    .page-card.sortable-ghost {
-      opacity: 0.4;
-      border-color: var(--accent);
-    }
-    .page-card.sortable-chosen {
-      cursor: grabbing;
-      border-color: #818CF8;
-    }
-    .page-preview {
-      width: 100%;
-      height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0B1120;
-      padding: 10px;
-      overflow: hidden;
-    }
-    .page-preview canvas {
-      max-width: 100%;
-      max-height: 100%;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      border-radius: 4px;
-    }
-    .page-card-footer {
-      padding: 8px 12px;
-      background: #1E293B;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--card-border);
-    }
-    .page-num {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    .page-actions {
-      display: flex;
-      gap: 4px;
-    }
-    .icon-btn {
-      background: #334155;
-      border: none;
-      color: var(--text-main);
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .icon-btn:hover { background: #475569; }
-    .icon-btn.danger:hover { background: var(--danger); color: white; }
+  --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.34, 0.64, 1);
 
-    /* 處理中 Spinner */
-    .spinner {
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+  --slider-track: rgba(255, 255, 255, 0.14);
+  --checker-1: #232328;
+  --checker-2: #17171b;
+}
 
-    /* 頁尾 */
-    footer {
-      border-top: 1px solid var(--card-border);
-      text-align: center;
-      padding: 18px;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: auto;
-    }
+[data-theme="light"] {
+  --bg-base: #f5f5f7;
+  --bg-elevated: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-strong: rgba(255, 255, 255, 0.90);
+  --glass-bg-hover: rgba(255, 255, 255, 0.88);
+  --glass-header: rgba(245, 245, 247, 0.76);
+  --glass-input: rgba(255, 255, 255, 0.84);
+  --glass-segment: rgba(0, 0, 0, 0.055);
+  --glass-segment-pill: #ffffff;
 
-    /* 響應式 */
-    @media (max-width: 768px) {
-      .header-inner { flex-direction: column; align-items: flex-start; }
-      .ctrl-bar { flex-direction: column; align-items: stretch; }
-      .item-card { flex-wrap: wrap; }
-      .pdf-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-      .page-preview { height: 170px; }
-    }
-  </style>
+  --border-hairline: rgba(0, 0, 0, 0.075);
+  --border-subtle: rgba(0, 0, 0, 0.11);
+  --border-hover: rgba(0, 0, 0, 0.20);
+  --specular-top: rgba(255, 255, 255, 0.96);
+  --specular-bottom: rgba(0, 0, 0, 0.04);
+  --spotlight-surface: rgba(0, 113, 227, 0.048);
+  --spotlight-rim: rgba(0, 113, 227, 0.42);
+
+  --text-1: #1d1d1f;
+  --text-2: #515154;
+  --text-3: #86868b;
+
+  --apple-blue: #0071e3;
+  --apple-blue-btn: #0071e3;
+  --apple-blue-btn-hover: #0077ed;
+  --apple-blue-soft: rgba(0, 113, 227, 0.10);
+  --apple-blue-glow: rgba(0, 113, 227, 0.26);
+
+  --apple-green: #1e873a;
+  --apple-green-btn: #248a3d;
+  --apple-green-soft: rgba(36, 138, 61, 0.11);
+
+  --apple-orange: #c96f00;
+  --apple-orange-soft: rgba(201, 111, 0, 0.12);
+
+  --apple-red: #d70015;
+  --apple-red-soft: rgba(215, 0, 21, 0.10);
+
+  --hero-grad: linear-gradient(110deg, #1d1d1f 0%, #3a3a3c 40%, #0071e3 52%, #1d1d1f 64%, #515154 100%);
+
+  --shadow-card:
+    0 16px 44px rgba(0, 0, 0, 0.065),
+    0 2px 10px rgba(0, 0, 0, 0.035);
+  --shadow-float:
+    0 28px 72px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(0, 0, 0, 0.07);
+  --shadow-pill:
+    0 3px 12px rgba(0, 0, 0, 0.09),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+
+  --slider-track: rgba(0, 0, 0, 0.12);
+  --checker-1: #e8e8ed;
+  --checker-2: #f5f5f7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-base);
+  color: var(--text-1);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  transition: background-color 0.55s var(--ease-apple), color 0.4s var(--ease-apple);
+  position: relative;
+}
+
+/* ==========================================================================
+   REAL-TIME SILK AURORA & STARLIGHT BOKEH CANVAS
+   ========================================================================== */
+#ambient_canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.95;
+  transition: opacity 0.6s var(--ease-apple);
+}
+[data-theme="light"] #ambient_canvas {
+  opacity: 0.68;
+}
+
+.ambient-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+[data-theme="light"] .ambient-grain {
+  opacity: 0.018;
+}
+
+header, .hero-section, .bento-strip, .tabs-wrap, main, footer {
+  position: relative;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   LIQUID GLASS OPTICS — PRISMATIC POINTER-TRACKING BORDER SHEEN
+   ========================================================================== */
+.liquid-glass {
+  position: relative;
+  --mx: 50%;
+  --my: 50%;
+  background: var(--glass-bg);
+  backdrop-filter: saturate(200%) blur(34px);
+  -webkit-backdrop-filter: saturate(200%) blur(34px);
+  border: 1px solid var(--border-hairline);
+  box-shadow:
+    var(--shadow-card),
+    inset 0 1px 0 var(--specular-top),
+    inset 0 -1px 0 var(--specular-bottom);
+}
+
+/* Inner surface spotlight */
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(560px circle at var(--mx) var(--my), var(--spotlight-surface), transparent 58%);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-apple);
+  z-index: 0;
+}
+.liquid-glass:hover::after {
+  opacity: 1;
+}
+
+/* 1px specular rim refraction tracing the pointer */
+.rim-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(320px circle at var(--mx) var(--my), var(--spotlight-rim), transparent 62%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-apple);
+  z-index: 2;
+}
+.liquid-glass:hover > .rim-glow {
+  opacity: 1;
+}
+.liquid-glass > *:not(.rim-glow):not(.tab-indicator) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   APPLE GLOBAL FROSTED NAVIGATION BAR
+   ========================================================================== */
+header {
+  background: var(--glass-header);
+  backdrop-filter: saturate(200%) blur(28px);
+  -webkit-backdrop-filter: saturate(200%) blur(28px);
+  border-bottom: 1px solid var(--border-hairline);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background-color 0.45s var(--ease-apple), border-color 0.45s var(--ease-apple);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 11px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #32a0ff 0%, #0071e3 48%, #5e5ce6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  box-shadow:
+    0 8px 22px rgba(0, 113, 227, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 0.4s var(--ease-spring), box-shadow 0.4s var(--ease-apple);
+  cursor: pointer;
+}
+.brand-logo:hover {
+  transform: scale(1.08) rotate(-3deg);
+  box-shadow:
+    0 12px 28px rgba(0, 113, 227, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+.brand-logo svg {
+  width: 19px;
+  height: 19px;
+  color: #ffffff;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.28));
+}
+
+.brand-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-text h1 {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+}
+.brand-pro-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--apple-blue);
+  padding: 2.5px 7px;
+  border-radius: 6px;
+  background: var(--apple-blue-soft);
+  border: 1px solid rgba(41, 151, 255, 0.28);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--glass-segment);
+  border: 1px solid var(--border-hairline);
+  white-space: nowrap;
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--apple-green);
+  box-shadow: 0 0 12px var(--apple-green);
+  animation: breathe 2.6s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.84); }
+}
+
+.nav-pill-btn, .theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--glass-segment);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-1);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-apple);
+  white-space: nowrap;
+  font-family: inherit;
+}
+.nav-pill-btn {
+  padding: 6px 12px;
+}
+.nav-pill-btn .kbd-mini {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-3);
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--glass-segment);
+  border: 1px solid var(--border-hairline);
+}
+.theme-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+.nav-pill-btn:hover, .theme-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+.nav-pill-btn:active, .theme-btn:active {
+  transform: scale(0.95);
+}
+.nav-pill-btn svg, .theme-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   EDITORIAL KEYNOTE HERO SECTION
+   ========================================================================== */
+.hero-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 38px 24px 10px;
+  text-align: center;
+  animation: heroReveal 0.85s var(--ease-apple) both;
+}
+@keyframes heroReveal {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--apple-blue);
+  margin-bottom: 12px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--apple-blue-soft);
+  border: 1px solid rgba(41, 151, 255, 0.24);
+}
+
+.hero-title {
+  font-size: clamp(30px, 4.4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.038em;
+  line-height: 1.1;
+  background: var(--hero-grad);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+  animation: metallicSweep 9s ease-in-out infinite;
+}
+@keyframes metallicSweep {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.hero-subtitle {
+  font-size: clamp(14px, 1.55vw, 16.5px);
+  font-weight: 400;
+  color: var(--text-2);
+  max-width: 650px;
+  margin: 0 auto;
+  line-height: 1.58;
+  letter-spacing: -0.012em;
+}
+
+/* ==========================================================================
+   APPLE KEYNOTE BENTO LIVE TELEMETRY STRIP
+   ========================================================================== */
+.bento-strip {
+  max-width: 1200px;
+  margin: 22px auto 0;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  animation: heroReveal 0.9s var(--ease-apple) 0.06s both;
+}
+
+.bento-card {
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.3s var(--ease-apple), border-color 0.3s;
+}
+.bento-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-hover);
+}
+.bento-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--glass-segment);
+  border: 1px solid var(--border-hairline);
+  color: var(--apple-blue);
+}
+.bento-icon.green { color: var(--apple-green); background: var(--apple-green-soft); border-color: rgba(48, 209, 88, 0.25); }
+.bento-icon.purple { color: var(--apple-purple); background: rgba(191, 90, 242, 0.14); border-color: rgba(191, 90, 242, 0.25); }
+.bento-icon.blue { color: var(--apple-blue); background: var(--apple-blue-soft); border-color: rgba(41, 151, 255, 0.25); }
+.bento-icon svg { width: 17px; height: 17px; }
+
+.bento-meta { min-width: 0; }
+.bento-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+  margin-bottom: 2px;
+}
+.bento-val {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   MACOS / IOS SEGMENTED CONTROL WITH SPRING SLIDING PILL
+   ========================================================================== */
+.tabs-wrap {
+  max-width: 1200px;
+  margin: 22px auto 0;
+  padding: 0 24px;
+  display: flex;
+  justify-content: center;
+  animation: heroReveal 0.9s var(--ease-apple) 0.1s both;
+}
+
+.tabs-nav {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px;
+  gap: 4px;
+}
+
+.tab-indicator {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  border-radius: 999px;
+  background: var(--glass-segment-pill);
+  box-shadow: var(--shadow-pill);
+  border: 1px solid var(--border-subtle);
+  transition: transform 0.44s var(--ease-apple), width 0.44s var(--ease-apple);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tab-btn {
+  position: relative;
+  z-index: 1;
+  background: none;
+  border: none;
+  color: var(--text-2);
+  padding: 10px 22px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.25s var(--ease-apple);
+  white-space: nowrap;
+  font-family: inherit;
+}
+.tab-btn:hover, .tab-btn.active {
+  color: var(--text-1);
+}
+.tab-btn svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0.72;
+  transition: opacity 0.25s, color 0.25s, transform 0.35s var(--ease-spring);
+}
+.tab-btn.active svg {
+  opacity: 1;
+  color: var(--apple-blue);
+  transform: scale(1.08);
+}
+
+/* ==========================================================================
+   MAIN WORKSPACE
+   ========================================================================== */
+main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 24px 64px;
+}
+
+.tab-content { display: none; }
+.tab-content.active {
+  display: block;
+  animation: panelEnter 0.48s var(--ease-apple) both;
+}
+@keyframes panelEnter {
+  from { opacity: 0; transform: translateY(14px) scale(0.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ==========================================================================
+   3D LIQUID GLASS DROP ZONE
+   ========================================================================== */
+.drop-zone {
+  border-radius: var(--radius-xl);
+  padding: 50px 28px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.38s var(--ease-apple),
+    border-color 0.3s var(--ease-apple),
+    background-color 0.3s var(--ease-apple),
+    box-shadow 0.38s var(--ease-apple);
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  inset: 11px;
+  border-radius: calc(var(--radius-xl) - 9px);
+  border: 1.5px dashed var(--border-hairline);
+  pointer-events: none;
+  transition: border-color 0.35s var(--ease-apple), inset 0.35s var(--ease-apple);
+  z-index: 1;
+}
+
+.drop-zone:hover {
+  border-color: var(--border-hover);
+  background: var(--glass-bg-hover);
+  transform: translateY(-3px);
+}
+.drop-zone:hover::before {
+  border-color: rgba(41, 151, 255, 0.42);
+}
+
+.drop-zone.dragover {
+  border-color: var(--apple-blue);
+  background: var(--apple-blue-soft);
+  transform: scale(1.01);
+  box-shadow:
+    0 28px 72px rgba(0, 113, 227, 0.32),
+    0 0 0 3px rgba(41, 151, 255, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+.drop-zone.dragover::before {
+  border-color: var(--apple-blue);
+  inset: 15px;
+}
+
+.drop-zone-icon-wrap {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(41, 151, 255, 0.25), rgba(94, 92, 230, 0.16));
+  border: 1px solid rgba(41, 151, 255, 0.34);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--apple-blue);
+  box-shadow:
+    0 16px 34px rgba(0, 113, 227, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  transition: transform 0.45s var(--ease-spring), box-shadow 0.4s var(--ease-apple);
+}
+.drop-zone:hover .drop-zone-icon-wrap {
+  transform: translateY(-6px) scale(1.07);
+  box-shadow:
+    0 22px 44px rgba(0, 113, 227, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.52);
+}
+.drop-zone-icon-wrap svg { width: 32px; height: 32px; }
+
+.drop-zone-title {
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+  color: var(--text-1);
+}
+.drop-zone-desc {
+  font-size: 13.5px;
+  color: var(--text-2);
+  line-height: 1.6;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.drop-zone-desc strong { color: var(--text-1); font-weight: 600; }
+
+.format-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 18px;
+}
+.format-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-2);
+  background: var(--glass-segment);
+  border: 1px solid var(--border-hairline);
+  padding: 4px 11px;
+  border-radius: 999px;
+}
+.format-pill.featured {
+  color: var(--apple-blue);
+  background: var(--apple-blue-soft);
+  border-color: rgba(41, 151, 255, 0.28);
+}
+
+.file-input { display: none; }
+
+/* ==========================================================================
+   MACOS INSPECTOR CONTROL BAR & CUSTOM FROSTED SELECT POPOVER
+   ========================================================================== */
+.ctrl-bar {
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 18px 22px;
+}
+
+.ctrl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ctrl-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ctrl-divider {
+  width: 1px;
+  height: 38px;
+  background: var(--border-hairline);
+  align-self: center;
+}
+
+/* Hidden native select (kept as state/event source of truth) */
+select.apple-native-select {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Custom macOS Glass Select Trigger */
+.apple-select-trigger {
+  font-family: inherit;
+  background: var(--glass-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-1);
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  min-width: 174px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s, transform 0.18s;
+  box-shadow: inset 0 1px 0 var(--specular-top);
+  text-align: left;
+}
+.apple-select-trigger:hover {
+  border-color: var(--border-hover);
+  background: var(--glass-bg-hover);
+}
+.apple-select-trigger.open, .apple-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3.5px var(--apple-blue-soft);
+}
+.apple-select-trigger .chev {
+  width: 14px;
+  height: 14px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  transition: transform 0.26s var(--ease-apple), color 0.2s;
+}
+.apple-select-trigger.open .chev {
+  transform: rotate(180deg);
+  color: var(--apple-blue);
+}
+
+/* Floating macOS Sequoia Popover Menu */
+.apple-select-popover {
+  position: fixed;
+  z-index: 1200;
+  min-width: 210px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 15px;
+  background: var(--glass-bg-strong);
+  backdrop-filter: saturate(220%) blur(40px);
+  -webkit-backdrop-filter: saturate(220%) blur(40px);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-float), inset 0 1px 0 var(--specular-top);
+  opacity: 0;
+  transform: translateY(-6px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease-apple), transform 0.24s var(--ease-apple);
+}
+.apple-select-popover.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.apple-select-option {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-1);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 11px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.14s, color 0.14s;
+}
+.apple-select-option:hover {
+  background: var(--apple-blue-btn);
+  color: #ffffff;
+}
+.apple-select-option.selected {
+  font-weight: 600;
+  color: var(--apple-blue);
+}
+.apple-select-option.selected:hover {
+  color: #ffffff;
+}
+.apple-select-option svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0;
+}
+.apple-select-option.selected svg {
+  opacity: 1;
+}
+
+input[type="text"], input[type="number"] {
+  font-family: inherit;
+  background: var(--glass-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-1);
+  padding: 9px 13px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-variant-numeric: tabular-nums;
+}
+input[type="number"]:hover { border-color: var(--border-hover); }
+input:focus {
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3.5px var(--apple-blue-soft);
+}
+
+.size-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.size-inputs input[type="number"] {
+  width: 88px;
+  min-width: 0;
+  text-align: center;
+}
+.size-sep { font-size: 14px; color: var(--text-3); font-weight: 600; }
+
+.lock-ratio-btn {
+  background: var(--glass-segment);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-2);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.22s var(--ease-apple);
+  flex-shrink: 0;
+}
+.lock-ratio-btn svg { width: 15px; height: 15px; }
+.lock-ratio-btn:hover, .lock-ratio-btn.locked {
+  background: var(--apple-blue-soft);
+  border-color: rgba(41, 151, 255, 0.45);
+  color: var(--apple-blue);
+}
+
+#custom_size_row {
+  display: none;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#custom_size_row.visible { display: flex; }
+
+/* Apple Precision Range Slider */
+.quality-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 38px;
+}
+.quality-val {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-1);
+  min-width: 42px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 148px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--apple-blue) 0%,
+    var(--apple-blue) var(--slider-pct, 83%),
+    var(--slider-track) var(--slider-pct, 83%),
+    var(--slider-track) 100%
+  );
+  outline: none;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 0.5px solid rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s var(--ease-spring), box-shadow 0.2s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.16);
+  box-shadow: 0 4px 14px rgba(0, 113, 227, 0.5);
+}
+
+/* ==========================================================================
+   APPLE PILL BUTTONS
+   ========================================================================== */
+.btn {
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    transform 0.22s var(--ease-apple),
+    background-color 0.22s var(--ease-apple),
+    box-shadow 0.25s var(--ease-apple),
+    border-color 0.22s var(--ease-apple),
+    opacity 0.22s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+.btn:disabled {
+  opacity: 0.36;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.btn:not(:disabled):active { transform: scale(0.95); }
+
+.btn-primary {
+  background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+  color: #ffffff;
+  box-shadow:
+    0 8px 24px var(--apple-blue-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+.btn-primary:not(:disabled):hover {
+  filter: brightness(1.07);
+  transform: translateY(-1.5px);
+  box-shadow:
+    0 12px 30px var(--apple-blue-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.btn-secondary {
+  background: var(--glass-segment);
+  color: var(--text-1);
+  border: 1px solid var(--border-subtle);
+  box-shadow: inset 0 1px 0 var(--specular-top);
+}
+.btn-secondary:not(:disabled):hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: linear-gradient(180deg, #32d75b 0%, #24b946 100%);
+  color: #ffffff;
+  box-shadow:
+    0 8px 24px rgba(40, 205, 65, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+.btn-success:not(:disabled):hover {
+  filter: brightness(1.06);
+  transform: translateY(-1.5px);
+  box-shadow:
+    0 12px 30px rgba(40, 205, 65, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.btn-danger {
+  background: var(--apple-red-soft);
+  color: var(--apple-red);
+  border: 1px solid rgba(255, 69, 58, 0.25);
+}
+.btn-danger:not(:disabled):hover {
+  background: rgba(255, 69, 58, 0.22);
+  border-color: rgba(255, 69, 58, 0.42);
+  transform: translateY(-1px);
+}
+
+.btn-sm { padding: 8px 15px; font-size: 12.5px; }
+
+.ctrl-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Batch Progress Strip (Image Converter) */
+.batch-progress-strip {
+  display: none;
+  margin-bottom: 16px;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+}
+.batch-progress-strip.visible { display: block; animation: panelEnter 0.3s var(--ease-apple) both; }
+
+/* ==========================================================================
+   IMAGE ITEM CARDS
+   ========================================================================== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px 4px 12px;
+}
+.section-title { font-size: 15px; font-weight: 600; letter-spacing: -0.015em; color: var(--text-1); }
+.section-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--glass-segment);
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-hairline);
+  font-variant-numeric: tabular-nums;
+}
+
+.item-list { display: flex; flex-direction: column; gap: 12px; }
+
+.item-card {
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.28s var(--ease-apple), border-color 0.25s, background-color 0.25s, box-shadow 0.28s;
+  overflow: hidden;
+  animation: cardSlideIn 0.35s var(--ease-apple) both;
+}
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.item-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: transparent;
+  transition: background-color 0.3s;
+  z-index: 3;
+}
+.item-card.status-done::before { background: var(--apple-green); }
+.item-card.status-error::before { background: var(--apple-red); }
+.item-card.status-converting::before {
+  background: var(--apple-blue);
+  animation: pulseBar 1.1s ease-in-out infinite;
+}
+@keyframes pulseBar { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+.item-card:hover {
+  border-color: var(--border-hover);
+  background: var(--glass-bg-hover);
+  transform: translateY(-2px);
+}
+
+.item-thumb {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--glass-input);
+  flex-shrink: 0;
+  border: 1px solid var(--border-subtle);
+  cursor: zoom-in;
+  transition: transform 0.28s var(--ease-spring), box-shadow 0.28s;
+}
+.item-thumb:hover {
+  transform: scale(1.07);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.38);
+}
+
+.item-info { flex: 1; min-width: 0; }
+.item-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+  color: var(--text-1);
+}
+.item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.tag-neutral { background: var(--glass-segment); color: var(--text-2); border: 1px solid var(--border-hairline); }
+.tag-heic { background: var(--apple-orange-soft); color: var(--apple-orange); border: 1px solid rgba(255, 159, 10, 0.28); }
+.tag-success { background: var(--apple-green-soft); color: var(--apple-green); border: 1px solid rgba(48, 209, 88, 0.28); }
+.tag-danger { background: var(--apple-red-soft); color: var(--apple-red); border: 1px solid rgba(255, 69, 58, 0.28); }
+.tag-active { background: var(--apple-blue-soft); color: var(--apple-blue); border: 1px solid rgba(41, 151, 255, 0.28); }
+
+.item-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(128, 128, 138, 0.25);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.72s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.icon-btn {
+  background: var(--glass-segment);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-2);
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--ease-apple);
+  flex-shrink: 0;
+}
+.icon-btn svg { width: 14px; height: 14px; }
+.icon-btn:hover {
+  background: var(--glass-bg-hover);
+  color: var(--text-1);
+  border-color: var(--border-hover);
+  transform: scale(1.07);
+}
+.icon-btn.danger:hover {
+  background: var(--apple-red-soft);
+  color: var(--apple-red);
+  border-color: rgba(255, 69, 58, 0.35);
+}
+
+/* ==========================================================================
+   PDF PAGE ORGANIZER GRID
+   ========================================================================== */
+.pdf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(198px, 1fr));
+  gap: 20px;
+  margin-top: 22px;
+}
+
+.page-card {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.32s var(--ease-apple), border-color 0.25s, box-shadow 0.32s;
+  display: flex;
+  flex-direction: column;
+}
+.page-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-6px);
+  z-index: 10;
+}
+.page-card.sortable-ghost { opacity: 0.32; border-color: var(--apple-blue); transform: scale(0.96); }
+.page-card.sortable-chosen { cursor: grabbing; border-color: var(--apple-blue); box-shadow: 0 22px 54px rgba(0, 113, 227, 0.35); }
+
+.page-preview {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.24);
+  padding: 14px;
+  overflow: hidden;
+  position: relative;
+}
+[data-theme="light"] .page-preview { background: rgba(0, 0, 0, 0.035); }
+.page-preview canvas {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 5px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.38);
+  transition: transform 0.32s var(--ease-apple);
+}
+.page-card:hover .page-preview canvas { transform: scale(1.025); }
+
+.zoom-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.25s;
+  pointer-events: none;
+}
+.page-preview:hover .zoom-hint { background: rgba(0, 0, 0, 0.16); }
+.zoom-hint-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(18, 18, 22, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  transform: translateY(4px) scale(0.95);
+  transition: opacity 0.22s var(--ease-apple), transform 0.22s var(--ease-apple);
+}
+.zoom-hint-label svg { width: 13px; height: 13px; }
+.page-preview:hover .zoom-hint-label { opacity: 1; transform: translateY(0) scale(1); }
+
+.page-card-footer {
+  padding: 10px 14px;
+  background: var(--glass-bg-strong);
+  border-top: 1px solid var(--border-hairline);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.page-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-1);
+  background: var(--glass-segment);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-hairline);
+  font-variant-numeric: tabular-nums;
+}
+.page-actions { display: flex; gap: 6px; }
+
+/* ==========================================================================
+   PDF COMPRESSOR — APPLE HARDWARE TIER SELECTOR CARDS
+   ========================================================================== */
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+.tier-card {
+  position: relative;
+  text-align: left;
+  font-family: inherit;
+  background: var(--glass-input);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-apple);
+  color: var(--text-1);
+}
+.tier-card:hover {
+  border-color: var(--border-hover);
+  background: var(--glass-bg-hover);
+  transform: translateY(-2px);
+}
+.tier-card.selected {
+  border-color: var(--apple-blue);
+  background: var(--apple-blue-soft);
+  box-shadow: 0 0 0 3px rgba(41, 151, 255, 0.16);
+}
+.tier-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.tier-name { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.tier-badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--apple-blue);
+  background: var(--apple-blue-soft);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.tier-desc { font-size: 12px; color: var(--text-2); line-height: 1.45; }
+
+/* ==========================================================================
+   MACOS QUICK LOOK LOUPE (HOVER PREVIEW)
+   ========================================================================== */
+.pdf-zoom-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  background: var(--glass-bg-strong);
+  backdrop-filter: saturate(200%) blur(36px);
+  -webkit-backdrop-filter: saturate(200%) blur(36px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 10px 12px 12px;
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+  transition: opacity 0.18s var(--ease-apple), transform 0.18s var(--ease-apple);
+  opacity: 0;
+  transform: scale(0.95);
+}
+.pdf-zoom-tooltip.visible { display: block; opacity: 1; transform: scale(1); }
+.loupe-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+.traffic-dot { width: 8px; height: 8px; border-radius: 50%; }
+.traffic-dot.r { background: #ff5f57; }
+.traffic-dot.y { background: #febc2e; }
+.traffic-dot.g { background: #28c840; }
+.pdf-zoom-tooltip canvas { display: block; border-radius: 10px; background: #ffffff; }
+#img_zoom_tooltip img {
+  display: block;
+  border-radius: 10px;
+  background: repeating-conic-gradient(var(--checker-1) 0% 25%, var(--checker-2) 0% 50%) 50% / 16px 16px;
+}
+.pdf-zoom-label {
+  font-size: 11.5px;
+  color: var(--text-2);
+  font-weight: 500;
+  margin-left: 6px;
+  letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   PROGRESS & RESULT CARDS + SVG SAVINGS RING
+   ========================================================================== */
+.result-card {
+  border-radius: var(--radius-lg);
+  padding: 24px 26px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+  animation: panelEnter 0.42s var(--ease-apple) both;
+}
+
+.savings-ring-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+.savings-ring-wrap svg {
+  width: 64px;
+  height: 64px;
+  transform: rotate(-90deg);
+}
+.savings-ring-bg {
+  fill: none;
+  stroke: var(--slider-track);
+  stroke-width: 5.5;
+}
+.savings-ring-fg {
+  fill: none;
+  stroke: var(--apple-green);
+  stroke-width: 5.5;
+  stroke-linecap: round;
+  stroke-dasharray: 163.36;
+  stroke-dashoffset: 163.36;
+  transition: stroke-dashoffset 1s var(--ease-apple);
+}
+.savings-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--apple-green);
+}
+
+.progress-wrap {
+  background: var(--slider-track);
+  border-radius: 999px;
+  height: 7px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0071e3, #2997ff, #5e5ce6, #2997ff);
+  background-size: 240% 100%;
+  border-radius: 999px;
+  transition: width 0.3s var(--ease-apple);
+  animation: shimmerFlow 2s linear infinite;
+}
+@keyframes shimmerFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 240% 50%; }
+}
+
+/* ==========================================================================
+   MACOS FROSTED MODALS (BOOKMARK / SPOTLIGHT ⌘K / QUICK LOOK COMPARE)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s var(--ease-apple);
+}
+.modal-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.modal-sheet {
+  width: 100%;
+  max-width: 430px;
+  background: var(--glass-bg-strong);
+  backdrop-filter: saturate(220%) blur(40px);
+  -webkit-backdrop-filter: saturate(220%) blur(40px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 26px;
+  padding: 28px;
+  text-align: center;
+  box-shadow: var(--shadow-float), inset 0 1px 0 var(--specular-top);
+  transform: scale(0.92) translateY(16px);
+  transition: transform 0.38s var(--ease-apple);
+}
+.modal-backdrop.open .modal-sheet { transform: scale(1) translateY(0); }
+
+.modal-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 17px;
+  background: var(--apple-blue-soft);
+  border: 1px solid rgba(41, 151, 255, 0.3);
+  color: var(--apple-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-icon svg { width: 26px; height: 26px; }
+.modal-title { font-size: 19px; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 8px; color: var(--text-1); }
+.modal-desc { font-size: 13.5px; color: var(--text-2); line-height: 1.6; margin-bottom: 20px; }
+
+.kbd-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 22px; }
+.kbd-key {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  background: var(--glass-segment);
+  border: 1px solid var(--border-subtle);
+  border-bottom-width: 2.5px;
+  padding: 6px 13px;
+  border-radius: 9px;
+}
+.kbd-plus { font-size: 13px; color: var(--text-3); font-weight: 600; }
+
+/* Spotlight Command Palette (⌘K) */
+.cmd-sheet {
+  max-width: 520px;
+  padding: 12px;
+  text-align: left;
+  border-radius: 22px;
+}
+.cmd-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 12px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+.cmd-header svg { width: 18px; height: 18px; color: var(--text-3); flex-shrink: 0; }
+.cmd-input {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 2px 0 !important;
+  font-size: 15px !important;
+  color: var(--text-1);
+  outline: none;
+}
+.cmd-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.cmd-item {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-1);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.cmd-item:hover {
+  background: var(--apple-blue-btn);
+  color: #ffffff;
+}
+.cmd-item:hover .cmd-hint { color: rgba(255, 255, 255, 0.8); }
+.cmd-item-left { display: flex; align-items: center; gap: 10px; }
+.cmd-item-left svg { width: 16px; height: 16px; opacity: 0.85; }
+.cmd-hint { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+
+/* Quick Look Before/After Interactive Split Modal */
+.compare-sheet {
+  max-width: 860px;
+  padding: 18px 20px 20px;
+  text-align: left;
+}
+.compare-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+}
+.compare-stage {
+  position: relative;
+  width: 100%;
+  height: min(62vh, 520px);
+  border-radius: 16px;
+  overflow: hidden;
+  background: repeating-conic-gradient(var(--checker-1) 0% 25%, var(--checker-2) 0% 50%) 50% / 18px 18px;
+  border: 1px solid var(--border-subtle);
+  user-select: none;
+  cursor: ew-resize;
+}
+.compare-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.compare-after-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(0 0 0 50%);
+}
+.compare-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+}
+.compare-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: #1d1d1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+.compare-handle svg { width: 18px; height: 18px; }
+.compare-badge {
+  position: absolute;
+  top: 12px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(16, 16, 20, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+.compare-badge.left { left: 12px; }
+.compare-badge.right { right: 12px; }
+
+/* ==========================================================================
+   DYNAMIC ISLAND LIVE ACTIVITY
+   ========================================================================== */
+.toast-island {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-18px) scale(0.92);
+  z-index: 1100;
+  background: rgba(14, 14, 18, 0.88);
+  backdrop-filter: saturate(200%) blur(32px);
+  -webkit-backdrop-filter: saturate(200%) blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #f5f5f7;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-apple), transform 0.42s var(--ease-spring);
+}
+.toast-island.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+.toast-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--apple-blue);
+  box-shadow: 0 0 10px var(--apple-blue);
+}
+.toast-island.success .toast-dot {
+  background: var(--apple-green);
+  box-shadow: 0 0 10px var(--apple-green);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+footer {
+  border-top: 1px solid var(--border-hairline);
+  text-align: center;
+  padding: 24px;
+  font-size: 12px;
+  color: var(--text-3);
+  letter-spacing: -0.005em;
+  background: var(--glass-header);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+footer strong { color: var(--text-2); font-weight: 600; }
+
+/* ==========================================================================
+   RESPONSIVE REFINEMENTS
+   ========================================================================== */
+@media (max-width: 960px) {
+  .bento-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tier-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .header-inner { padding: 10px 16px; }
+  .status-pill, .cmd-trigger-btn { display: none; }
+  .hero-section { padding: 26px 16px 8px; }
+  .hero-eyebrow { font-size: 10.5px; padding: 4px 12px; }
+  .bento-strip { padding: 0 16px; gap: 10px; }
+  .tabs-wrap { padding: 0 12px; }
+  .tabs-nav { max-width: 100%; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+  .tabs-nav::-webkit-scrollbar { display: none; }
+  .tab-btn { padding: 9px 14px; font-size: 12.5px; gap: 6px; }
+  main { padding: 18px 16px 48px; }
+  .ctrl-bar { flex-direction: column; align-items: stretch; padding: 18px; }
+  .ctrl-divider { display: none; }
+  .ctrl-actions { margin-left: 0; width: 100%; justify-content: flex-end; }
+  .apple-select-trigger { width: 100%; }
+  .pdf-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .result-card { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .bento-strip { grid-template-columns: 1fr; }
+  .tab-btn { padding: 8px 10px; font-size: 11.5px; gap: 5px; }
+  .tab-btn svg { width: 14px; height: 14px; }
+}
+</style>
 </head>
 <body>
 
-  <!-- 頂部 Header -->
-  <header>
-    <div class="header-inner">
-      <div class="brand">
-        <div class="brand-icon">⚡</div>
-        <div class="brand-text">
-          <h1>個人專用極速轉檔與 PDF 編排工作台</h1>
-          <p>100% 瀏覽器本機記憶體運算 ｜ 零上傳安全隱私 ｜ HEIC · 圖片壓縮 · PDF 視覺增刪</p>
-        </div>
-      </div>
+<!-- Real-Time Silk Aurora & Starlight Bokeh Canvas -->
+<canvas id="ambient_canvas" aria-hidden="true"></canvas>
+<div class="ambient-grain" aria-hidden="true"></div>
 
-      <div class="bookmark-pill" onclick="showBookmarkTip()" title="點擊查看書籤設定方法">
-        ⭐ 按 <strong>Ctrl + D</strong> 加入書籤即點即用
+<!-- Global Apple Frosted Navigation Bar -->
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo" onclick="triggerAmbientPulse()" title="Local File Studio Pro" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L4.5 13.5h6.5L10 22l9.5-11.5H13L13 2z"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Local File Studio</h1>
+        <span class="brand-pro-tag">Pro</span>
       </div>
     </div>
-  </header>
 
-  <!-- 分頁切換選單 -->
-  <div class="tabs-nav">
-    <button class="tab-btn active" onclick="switchTab('tab_image')">
-      <span>🖼️</span> 圖片轉檔與大小調校 (HEIC/JPG/PNG)
+    <div class="header-actions">
+      <div class="status-pill" title="所有檔案皆於您的瀏覽器記憶體中運算，絕不上傳至任何雲端伺服器">
+        <span class="status-dot"></span>
+        <span>100% 本機離線運算</span>
+      </div>
+      <button class="nav-pill-btn cmd-trigger-btn" onclick="openCmdPalette()" type="button" title="開啟快速指令面板">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span>快速指令</span>
+        <span class="kbd-mini">Ctrl K</span>
+      </button>
+      <button class="nav-pill-btn" onclick="showBookmarkTip()" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>加入書籤</span>
+      </button>
+      <button class="theme-btn" id="theme_toggle_btn" onclick="toggleTheme()" type="button" title="切換深色 / 淺色外觀" aria-label="切換外觀">
+        <svg id="theme_icon_sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg id="theme_icon_moon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Editorial Keynote Hero -->
+<section class="hero-section">
+  <div class="hero-eyebrow">
+    <span>Apple-Grade Precision</span>
+    <span>·</span>
+    <span>Zero Upload Privacy</span>
+  </div>
+  <h2 class="hero-title">極速轉檔與 PDF 編排工作台</h2>
+  <p class="hero-subtitle">結合液態玻璃光學介面與本機硬體加速引擎。支援 HEIC 無損轉檔、精準體積瘦身、Quick Look 前後對比與視覺化 PDF 編排。</p>
+</section>
+
+<!-- Apple Keynote Bento Live Telemetry Strip -->
+<section class="bento-strip" aria-label="即時工作台狀態">
+  <div class="bento-card liquid-glass">
+    <div class="rim-glow"></div>
+    <div class="bento-icon blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+    </div>
+    <div class="bento-meta">
+      <div class="bento-label">本機已處理</div>
+      <div class="bento-val" id="stat_processed">0 個檔案</div>
+    </div>
+  </div>
+  <div class="bento-card liquid-glass">
+    <div class="rim-glow"></div>
+    <div class="bento-icon green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+        <polyline points="17 6 23 6 23 12"/>
+      </svg>
+    </div>
+    <div class="bento-meta">
+      <div class="bento-label">累計節省空間</div>
+      <div class="bento-val" id="stat_saved">0 B</div>
+    </div>
+  </div>
+  <div class="bento-card liquid-glass">
+    <div class="rim-glow"></div>
+    <div class="bento-icon purple">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="4" width="16" height="16" rx="2"/>
+        <rect x="9" y="9" width="6" height="6"/>
+        <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+      </svg>
+    </div>
+    <div class="bento-meta">
+      <div class="bento-label">本機運算引擎</div>
+      <div class="bento-val">Hardware Canvas · WASM</div>
+    </div>
+  </div>
+  <div class="bento-card liquid-glass">
+    <div class="rim-glow"></div>
+    <div class="bento-icon green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+    <div class="bento-meta">
+      <div class="bento-label">資料隱私防護</div>
+      <div class="bento-val">0 Bytes 上傳 · 完全離線</div>
+    </div>
+  </div>
+</section>
+
+<!-- macOS Segmented Navigation -->
+<div class="tabs-wrap">
+  <div class="tabs-nav liquid-glass" id="tabs_nav" role="tablist">
+    <div class="tab-indicator" id="tab_indicator"></div>
+    <button class="tab-btn active" data-tab="tab_image" data-palette="0" onclick="switchTab(this)" role="tab" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="4"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <path d="M21 15l-5-5L5 21"/>
+      </svg>
+      <span>圖片轉檔與壓縮</span>
     </button>
-    <button class="tab-btn" onclick="switchTab('tab_pdf_pages')">
-      <span>📑</span> PDF 視覺化頁面編排、增頁與刪頁
+    <button class="tab-btn" data-tab="tab_pdf_pages" data-palette="1" onclick="switchTab(this)" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="9" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="5" rx="1.5"/>
+        <rect x="14" y="12" width="7" height="9" rx="1.5"/>
+        <rect x="3" y="16" width="7" height="5" rx="1.5"/>
+      </svg>
+      <span>PDF 頁面編排</span>
     </button>
-    <button class="tab-btn" onclick="switchTab('tab_pdf_compress')">
-      <span>🗜️</span> PDF 檔案大小瘦身壓縮
+    <button class="tab-btn" data-tab="tab_pdf_compress" data-palette="2" onclick="switchTab(this)" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+        <path d="M12 12v9"/>
+        <path d="M8 17l4 4 4-4"/>
+      </svg>
+      <span>PDF 瘦身壓縮</span>
     </button>
   </div>
+</div>
 
-  <main>
-    <!-- ======================================================= -->
-    <!-- 分頁 1：圖片轉檔與大小調校 (PNG / JPG / HEIC / WEBP) -->
-    <!-- ======================================================= -->
-    <div id="tab_image" class="tab-content active">
-      <!-- 拖曳區 -->
-      <div class="drop-zone" id="img_drop_zone" onclick="document.getElementById('img_file_input').click()">
-        <div class="drop-zone-icon">📷</div>
-        <div class="drop-zone-title">拖曳圖片到此處，或點擊選取檔案</div>
-        <div class="drop-zone-desc">支援 <strong>Apple HEIC/HEIF</strong>、PNG、JPG、JPEG、WEBP、BMP 格式（可單張或多張批次）</div>
-        <input type="file" id="img_file_input" class="file-input" multiple accept=".heic,.heif,.png,.jpg,.jpeg,.webp,.bmp">
+<!-- Main Workspace -->
+<main>
+  <!-- ==================== TAB 1: IMAGE CONVERTER ==================== -->
+  <div id="tab_image" class="tab-content active">
+    <div class="drop-zone liquid-glass" id="img_drop_zone" onclick="document.getElementById('img_file_input').click()">
+      <div class="rim-glow"></div>
+      <div class="drop-zone-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
       </div>
-
-      <!-- 控制列 -->
-      <div class="ctrl-bar">
-        <div class="ctrl-group">
-          <label>目標輸出格式</label>
-          <select id="img_target_format">
-            <option value="image/jpeg" selected>JPG / JPEG</option>
-            <option value="image/png">PNG (無損透明)</option>
-            <option value="image/webp">WEBP (極致高壓縮率)</option>
-          </select>
-        </div>
-
-        <div class="ctrl-group" id="quality_group">
-          <label>壓縮品質 (<span id="img_quality_val">85%</span>)</label>
-          <input type="range" id="img_quality_slider" min="10" max="100" value="85" style="width: 140px;" oninput="document.getElementById('img_quality_val').textContent = this.value + '%'">
-        </div>
-
-        <div class="ctrl-group">
-          <label>解析度縮放 (寬度上限)</label>
-          <select id="img_resize_mode">
-            <option value="original" selected>保持原始解析度</option>
-            <option value="2560">2K QHD (最大寬 2560px)</option>
-            <option value="1920">Full HD (最大寬 1920px)</option>
-            <option value="1280">HD (最大寬 1280px)</option>
-            <option value="800">網頁小圖 (最大寬 800px)</option>
-            <option value="scale_75">等比例縮小 75%</option>
-            <option value="scale_50">等比例縮小 50%</option>
-          </select>
-        </div>
-
-        <div style="margin-left: auto; display: flex; gap: 10px;">
-          <button class="btn" id="btn_convert_all" onclick="processAllImages()" disabled>
-            ⚡ 開始轉檔與壓縮
-          </button>
-          <button class="btn btn-success" id="btn_zip_all" onclick="downloadAllZip()" style="display:none;">
-            📦 打包下載全部 (ZIP)
-          </button>
-          <button class="btn btn-secondary" onclick="clearImageList()">清空</button>
-        </div>
+      <div class="drop-zone-title">拖曳圖片至此，或點擊選取</div>
+      <div class="drop-zone-desc">
+        支援批次拖曳與 <strong>Ctrl + V</strong> 剪貼簿直接貼上；轉檔完成後可點擊「對比」開啟 Quick Look 前後滑動檢視
       </div>
-
-      <!-- 圖片處理清單 -->
-      <div id="img_list" class="item-list"></div>
+      <div class="format-pills">
+        <span class="format-pill featured">Apple HEIC / HEIF</span>
+        <span class="format-pill">PNG</span>
+        <span class="format-pill">JPG / JPEG</span>
+        <span class="format-pill">WEBP</span>
+        <span class="format-pill">BMP</span>
+      </div>
+      <input type="file" id="img_file_input" class="file-input" multiple accept=".heic,.heif,.png,.jpg,.jpeg,.webp,.bmp">
     </div>
 
-    <!-- ======================================================= -->
-    <!-- 分頁 2：PDF 視覺化頁面編排、增頁與刪頁 -->
-    <!-- ======================================================= -->
-    <div id="tab_pdf_pages" class="tab-content">
-      <div class="drop-zone" id="pdf_drop_zone" onclick="document.getElementById('pdf_file_input').click()">
-        <div class="drop-zone-icon">📑</div>
-        <div class="drop-zone-title">拖曳 PDF 檔案至此，或點擊選取</div>
-        <div class="drop-zone-desc">自動渲染每一頁縮圖，支援<strong>自由拖曳排序、增頁合併、刪頁、單頁旋轉</strong></div>
-        <input type="file" id="pdf_file_input" class="file-input" accept=".pdf">
+    <div class="ctrl-bar liquid-glass">
+      <div class="rim-glow"></div>
+      <div class="ctrl-group">
+        <label for="img_target_format">輸出格式</label>
+        <select id="img_target_format" class="apple-native-select" onchange="onFormatChange()">
+          <option value="image/jpeg" selected>JPG / JPEG</option>
+          <option value="image/png">PNG（無損透明）</option>
+          <option value="image/webp">WEBP（極致壓縮）</option>
+        </select>
       </div>
 
-      <!-- PDF 工具控制列 -->
-      <div class="ctrl-bar" id="pdf_ctrl_bar" style="display:none;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span id="pdf_summary" style="font-size: 14px; font-weight: 600;">共 0 頁</span>
-          <span style="font-size: 12px; color: var(--text-muted);">💡 提示：按住頁面縮圖可直接以滑鼠拖曳變更前後順序</span>
-        </div>
-
-        <div style="margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap;">
-          <!-- 附加/新增其他 PDF 頁面 -->
-          <button class="btn btn-secondary" onclick="document.getElementById('pdf_append_input').click()">
-            ➕ 插入/追加其他 PDF
-          </button>
-          <input type="file" id="pdf_append_input" class="file-input" accept=".pdf" multiple onchange="appendPdfFiles(this.files)">
-
-          <button class="btn btn-secondary" onclick="rotateAllPages(90)">
-            🔄 全部順時針旋轉
-          </button>
-          <button class="btn btn-danger" onclick="resetPdfStudio()">
-            清空重來
-          </button>
-          <button class="btn btn-success" id="btn_export_pdf" onclick="exportEditedPdf()">
-            💾 匯出新編排 PDF
-          </button>
+      <div class="ctrl-group" id="quality_group">
+        <label for="img_quality_slider">壓縮品質</label>
+        <div class="quality-display">
+          <input type="range" id="img_quality_slider" min="10" max="100" value="85" oninput="updateQualitySlider(this)">
+          <span class="quality-val" id="img_quality_val">85%</span>
         </div>
       </div>
 
-      <!-- PDF 縮圖排序網格容器 -->
-      <div id="pdf_pages_grid" class="pdf-grid"></div>
+      <div class="ctrl-divider"></div>
+
+      <div class="ctrl-group">
+        <label for="img_resize_mode">尺寸調整</label>
+        <select id="img_resize_mode" class="apple-native-select" onchange="onResizeModeChange()">
+          <option value="original" selected>保持原始解析度</option>
+          <option value="2560">2K QHD（最大寬 2560px）</option>
+          <option value="1920">Full HD（最大寬 1920px）</option>
+          <option value="1280">HD（最大寬 1280px）</option>
+          <option value="800">網頁縮圖（最大寬 800px）</option>
+          <option value="scale_75">等比例縮小 75%</option>
+          <option value="scale_50">等比例縮小 50%</option>
+          <option value="custom">自訂像素寬高...</option>
+        </select>
+      </div>
+
+      <div class="ctrl-group" id="custom_size_row">
+        <label>自訂尺寸（像素）</label>
+        <div class="size-inputs">
+          <input type="number" id="custom_w" placeholder="寬 px" min="1" max="20000" oninput="onCustomWChange()">
+          <span class="size-sep">×</span>
+          <input type="number" id="custom_h" placeholder="高 px" min="1" max="20000" oninput="onCustomHChange()">
+          <button class="lock-ratio-btn locked" id="lock_ratio_btn" onclick="toggleLockRatio()" title="鎖定長寬比" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <label for="img_size_target">檔案大小瘦身</label>
+        <select id="img_size_target" class="apple-native-select" onchange="onSizeTargetChange()">
+          <option value="none" selected>不限制（依品質）</option>
+          <option value="pct_70">壓到原檔 70%</option>
+          <option value="pct_50">壓到原檔 50%</option>
+          <option value="pct_30">壓到原檔 30%</option>
+          <option value="pct_10">壓到原檔 10%</option>
+          <option value="mb_10">每張不超過 10 MB</option>
+          <option value="mb_5">每張不超過 5 MB</option>
+          <option value="mb_2">每張不超過 2 MB</option>
+          <option value="mb_1">每張不超過 1 MB</option>
+          <option value="kb_500">每張不超過 500 KB</option>
+          <option value="custom">自訂上限 (MB)...</option>
+        </select>
+      </div>
+
+      <div class="ctrl-group" id="target_custom_row" style="display:none;">
+        <label for="target_custom_mb">每張上限 (MB)</label>
+        <input type="number" id="target_custom_mb" min="0.05" step="0.1" value="1" style="width:90px;">
+      </div>
+
+      <div class="ctrl-actions">
+        <button class="btn btn-primary" id="btn_convert_all" onclick="processAllImages()" disabled type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L4.5 13.5h6.5L10 22l9.5-11.5H13L13 2z"/>
+          </svg>
+          <span>開始轉檔</span>
+        </button>
+        <button class="btn btn-success" id="btn_zip_all" onclick="downloadAllZip()" style="display:none;" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>打包下載 ZIP</span>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="clearImageList()" type="button">清空</button>
+      </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- 分頁 3：PDF 檔案大小瘦身壓縮 -->
-    <!-- ======================================================= -->
-    <div id="tab_pdf_compress" class="tab-content">
-      <div class="drop-zone" id="pdf_compress_drop_zone" onclick="document.getElementById('pdf_compress_input').click()">
-        <div class="drop-zone-icon">🗜️</div>
-        <div class="drop-zone-title">拖曳要減小檔案體積的 PDF 檔案至此</div>
-        <div class="drop-zone-desc">重新採樣影像與重新壓縮，特別適用於手機掃描檔、大圖報表過大需要寄信時使用</div>
-        <input type="file" id="pdf_compress_input" class="file-input" accept=".pdf">
+    <div id="img_batch_progress" class="batch-progress-strip liquid-glass">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span id="img_batch_label" style="font-size:13px; font-weight:600;">正在轉檔...</span>
+        <span id="img_batch_pct" style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--apple-blue);">0%</span>
+      </div>
+      <div class="progress-wrap"><div id="img_batch_bar" class="progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <div id="img_list_header" class="section-header" style="display:none;">
+      <span class="section-title">圖片清單</span>
+      <span class="section-count" id="img_count_badge">0 張</span>
+    </div>
+    <div id="img_list" class="item-list"></div>
+  </div>
+
+  <!-- ==================== TAB 2: PDF PAGE ORGANIZER ==================== -->
+  <div id="tab_pdf_pages" class="tab-content">
+    <div class="drop-zone liquid-glass" id="pdf_drop_zone" onclick="document.getElementById('pdf_file_input').click()">
+      <div class="rim-glow"></div>
+      <div class="drop-zone-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div class="drop-zone-title">拖曳 PDF 至此，或點擊選取</div>
+      <div class="drop-zone-desc">
+        自動高解析渲染每頁縮圖，支援 <strong>拖曳排序、多檔合併、刪頁、旋轉</strong>；懸停縮圖即可啟動 macOS Quick Look 放大預覽
+      </div>
+      <div class="format-pills">
+        <span class="format-pill featured">多份 PDF 合併</span>
+        <span class="format-pill">拖曳排序</span>
+        <span class="format-pill">Quick Look 預覽</span>
+        <span class="format-pill">90° 旋轉</span>
+      </div>
+      <input type="file" id="pdf_file_input" class="file-input" accept=".pdf" multiple>
+    </div>
+
+    <div class="ctrl-bar liquid-glass" id="pdf_ctrl_bar" style="display:none;">
+      <div class="rim-glow"></div>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span id="pdf_summary" style="font-size:15px; font-weight:600; letter-spacing:-0.01em; font-variant-numeric:tabular-nums;">共 0 頁</span>
+        <span style="font-size:12.5px; color:var(--text-3);">拖曳卡片即可調整順序，懸停縮圖可清晰放大預覽</span>
+      </div>
+      <div class="ctrl-actions">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('pdf_append_input').click()" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>插入其他 PDF</span>
+        </button>
+        <input type="file" id="pdf_append_input" class="file-input" accept=".pdf" multiple onchange="appendPdfFiles(this.files)">
+        <button class="btn btn-secondary btn-sm" onclick="rotateAllPages(90)" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
+          </svg>
+          <span>全部旋轉</span>
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="resetPdfStudio()" type="button">清空重來</button>
+        <button class="btn btn-success" id="btn_export_pdf" onclick="exportEditedPdf()" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>匯出 PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="pdf_pages_grid" class="pdf-grid"></div>
+    <div id="pdf_zoom_tooltip" class="pdf-zoom-tooltip">
+      <div class="loupe-chrome">
+        <span class="traffic-dot r"></span><span class="traffic-dot y"></span><span class="traffic-dot g"></span>
+        <span class="pdf-zoom-label" id="pdf_zoom_label">第 1 頁</span>
+      </div>
+      <canvas id="pdf_zoom_canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 3: PDF COMPRESSOR ==================== -->
+  <div id="tab_pdf_compress" class="tab-content">
+    <div class="drop-zone liquid-glass" id="pdf_compress_drop_zone" onclick="document.getElementById('pdf_compress_input').click()">
+      <div class="rim-glow"></div>
+      <div class="drop-zone-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+          <line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>
+        </svg>
+      </div>
+      <div class="drop-zone-title">拖曳要瘦身的 PDF 至此</div>
+      <div class="drop-zone-desc">
+        智慧重新採樣頁面影像並重新封裝，特別適合 <strong>手機掃描檔、簡報與高畫質大圖報表</strong>
+      </div>
+      <div class="format-pills">
+        <span class="format-pill featured">輕量網路版 72 DPI</span>
+        <span class="format-pill">螢幕閱讀版 120 DPI</span>
+        <span class="format-pill">高解析版 150 DPI</span>
+      </div>
+      <input type="file" id="pdf_compress_input" class="file-input" accept=".pdf">
+    </div>
+
+    <div class="ctrl-bar liquid-glass" id="pdf_compress_ctrl" style="display:none; flex-direction:column; align-items:stretch;">
+      <div class="rim-glow"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <div style="font-size:11px; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">選擇壓縮等級</div>
+          <div id="compress_info" style="font-size:13.5px; font-weight:500; color:var(--text-2); font-variant-numeric:tabular-nums;"></div>
+        </div>
+        <button class="btn btn-primary" id="btn_start_pdf_compress" onclick="startPdfCompression()" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L4.5 13.5h6.5L10 22l9.5-11.5H13L13 2z"/>
+          </svg>
+          <span>開始壓縮</span>
+        </button>
       </div>
 
-      <div class="ctrl-bar" id="pdf_compress_ctrl" style="display:none;">
-        <div class="ctrl-group">
-          <label>壓縮目標設定</label>
-          <select id="pdf_compress_profile">
-            <option value="web" selected>📱 輕量網路版 (72-96 DPI, 品質 65%, 適合小於 2 MB Email)</option>
-            <option value="balanced">💻 螢幕閱讀版 (120 DPI, 品質 80%, 清晰與體積平衡)</option>
-            <option value="print">🖨️ 高解析版 (150 DPI, 品質 88%, 保留細節)</option>
-          </select>
-        </div>
-
-        <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
-          <span id="compress_info" style="font-size: 13px; color: var(--text-muted);">原始大小: -</span>
-          <button class="btn" id="btn_start_pdf_compress" onclick="startPdfCompression()">
-            ⚡ 開始壓縮瘦身
-          </button>
-        </div>
-      </div>
-
-      <!-- 壓縮進度與結果 -->
-      <div id="compress_progress_box" style="display:none; margin-top: 20px;" class="item-card">
-        <div class="item-info">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <span id="compress_status_text" style="font-size: 14px; font-weight: 600;">正在處理中...</span>
-            <span id="compress_percent_text" style="font-size: 14px; color: var(--accent);">0%</span>
+      <!-- Synced hidden select + Apple Tier Cards -->
+      <select id="pdf_compress_profile" style="display:none;">
+        <option value="web" selected>web</option>
+        <option value="balanced">balanced</option>
+        <option value="print">print</option>
+      </select>
+      <div class="tier-grid" id="pdf_tier_grid">
+        <button type="button" class="tier-card selected" data-profile="web" onclick="selectCompressTier(this)">
+          <div class="tier-top">
+            <span class="tier-name">輕量網路版</span>
+            <span class="tier-badge">72 DPI</span>
           </div>
-          <div style="width: 100%; height: 8px; background: #0F172A; border-radius: 4px; overflow: hidden;">
-            <div id="compress_progress_bar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.2s;"></div>
+          <div class="tier-desc">品質 65% · 極致瘦身，最適合 Email 附件與即時通訊傳送</div>
+        </button>
+        <button type="button" class="tier-card" data-profile="balanced" onclick="selectCompressTier(this)">
+          <div class="tier-top">
+            <span class="tier-name">螢幕閱讀版</span>
+            <span class="tier-badge">120 DPI</span>
           </div>
-        </div>
-      </div>
-
-      <div id="compress_result_card" style="display:none; margin-top: 20px;" class="item-card">
-        <div style="font-size: 32px;">🎉</div>
-        <div class="item-info">
-          <div style="font-size: 16px; font-weight: 700;">壓縮完成！</div>
-          <div id="compress_stat_summary" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;"></div>
-        </div>
-        <a id="btn_download_compressed_pdf" class="btn btn-success" download="compressed.pdf">
-          💾 下載已瘦身 PDF
-        </a>
+          <div class="tier-desc">品質 80% · 畫質與體積完美平衡，適合平板與筆電閱讀</div>
+        </button>
+        <button type="button" class="tier-card" data-profile="print" onclick="selectCompressTier(this)">
+          <div class="tier-top">
+            <span class="tier-name">高解析版</span>
+            <span class="tier-badge">150 DPI</span>
+          </div>
+          <div class="tier-desc">品質 88% · 保留圖表與細字細節，適合存檔與列印</div>
+        </button>
       </div>
     </div>
-  </main>
 
-  <footer>
-    <p>⚡ Local File Studio ｜ 100% 本地運算無資料上傳風險 ｜ 建議使用 Edge / Chrome 獲得最佳效能</p>
-  </footer>
+    <div id="compress_progress_box" style="display:none;" class="result-card liquid-glass">
+      <div class="spinner" style="width:22px;height:22px;border-width:2.5px;color:var(--apple-blue);"></div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span id="compress_status_text" style="font-size:14.5px; font-weight:600;">正在處理中...</span>
+          <span id="compress_percent_text" style="font-family:var(--font-mono); font-size:14px; color:var(--apple-blue); font-weight:600; font-variant-numeric:tabular-nums;">0%</span>
+        </div>
+        <div class="progress-wrap">
+          <div id="compress_progress_bar" class="progress-bar" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
 
-  <!-- ======================================================= -->
-  <!-- 核心邏輯 JavaScript -->
-  <!-- ======================================================= -->
-  <script>
-    // 1. 初始化 PDF.js Worker
-    if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
+    <div id="compress_result_card" style="display:none;" class="result-card liquid-glass">
+      <div class="rim-glow"></div>
+      <div class="savings-ring-wrap">
+        <svg viewBox="0 0 64 64">
+          <circle class="savings-ring-bg" cx="32" cy="32" r="26"/>
+          <circle class="savings-ring-fg" id="savings_ring_fg" cx="32" cy="32" r="26"/>
+        </svg>
+        <div class="savings-ring-text" id="savings_ring_text">0%</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-0.02em; margin-bottom:5px;">PDF 瘦身完成</div>
+        <div id="compress_stat_summary" style="font-size:13.5px; color:var(--text-2); display:flex; align-items:center; gap:8px; flex-wrap:wrap;"></div>
+      </div>
+      <a id="btn_download_compressed_pdf" class="btn btn-success" download="compressed.pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>下載瘦身 PDF</span>
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- Image Quick Look Hover Loupe -->
+<div id="img_zoom_tooltip" class="pdf-zoom-tooltip">
+  <div class="loupe-chrome">
+    <span class="traffic-dot r"></span><span class="traffic-dot y"></span><span class="traffic-dot g"></span>
+    <span class="pdf-zoom-label" id="img_zoom_label"></span>
+  </div>
+  <img id="img_zoom_img" alt="">
+</div>
+
+<!-- Apple Frosted Bookmark Sheet Modal -->
+<div class="modal-backdrop" id="bookmark_modal" onclick="if(event.target===this) closeBookmarkTip()">
+  <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="bookmark_modal_title">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+      </svg>
+    </div>
+    <h3 class="modal-title" id="bookmark_modal_title">加入瀏覽器書籤</h3>
+    <p class="modal-desc">按下快捷鍵即可將 Local File Studio Pro 釘選至書籤列，日後一鍵極速開啟，完全離線隨時可用。</p>
+    <div class="kbd-row">
+      <span class="kbd-key">Ctrl</span><span class="kbd-plus">+</span><span class="kbd-key">D</span>
+      <span class="kbd-plus" style="margin:0 6px;">/</span>
+      <span class="kbd-key">⌘</span><span class="kbd-plus">+</span><span class="kbd-key">D</span>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeBookmarkTip()" type="button">知道了</button>
+  </div>
+</div>
+
+<!-- Spotlight Command Palette Modal (Ctrl+K / ⌘K) -->
+<div class="modal-backdrop" id="cmd_modal" onclick="if(event.target===this) closeCmdPalette()">
+  <div class="modal-sheet cmd-sheet" role="dialog" aria-modal="true" aria-label="快速指令面板">
+    <div class="cmd-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="cmd_search_input" class="cmd-input" placeholder="搜尋功能或快速切換..." oninput="filterCmdItems(this.value)">
+      <span class="kbd-key" style="font-size:11px; padding:3px 7px; border-bottom-width:1.5px;">ESC</span>
+    </div>
+    <div class="cmd-list" id="cmd_list">
+      <button type="button" class="cmd-item" data-kw="圖片轉檔 壓縮 image heic" onclick="runCmd(()=>switchTab(document.querySelector('[data-tab=tab_image]')))">
+        <span class="cmd-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>切換至：圖片轉檔與壓縮</span>
+        <span class="cmd-hint">工作台 1</span>
+      </button>
+      <button type="button" class="cmd-item" data-kw="pdf 頁面編排 排序 合併 旋轉" onclick="runCmd(()=>switchTab(document.querySelector('[data-tab=tab_pdf_pages]')))">
+        <span class="cmd-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>切換至：PDF 頁面編排</span>
+        <span class="cmd-hint">工作台 2</span>
+      </button>
+      <button type="button" class="cmd-item" data-kw="pdf 瘦身壓縮 compress" onclick="runCmd(()=>switchTab(document.querySelector('[data-tab=tab_pdf_compress]')))">
+        <span class="cmd-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>切換至：PDF 瘦身壓縮</span>
+        <span class="cmd-hint">工作台 3</span>
+      </button>
+      <button type="button" class="cmd-item" data-kw="深色 淺色 外觀 theme dark light" onclick="runCmd(()=>toggleTheme())">
+        <span class="cmd-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg>切換深色 Pro / 淺色 Studio 外觀</span>
+        <span class="cmd-hint">外觀</span>
+      </button>
+      <button type="button" class="cmd-item" data-kw="書籤 bookmark" onclick="runCmd(()=>showBookmarkTip())">
+        <span class="cmd-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>查看加入書籤快捷鍵</span>
+        <span class="cmd-hint">Ctrl + D</span>
+      </button>
+      <button type="button" class="cmd-item" data-kw="清空 clear reset" onclick="runCmd(()=>{clearImageList(); resetPdfStudio();})">
+        <span class="cmd-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>清空目前工作台清單</span>
+        <span class="cmd-hint">重置</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Look Before / After Interactive Split Comparison Modal -->
+<div class="modal-backdrop" id="compare_modal" onclick="if(event.target===this) closeCompareModal()">
+  <div class="modal-sheet compare-sheet" role="dialog" aria-modal="true" aria-label="Quick Look 畫質對比">
+    <div class="compare-header">
+      <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+        <div class="loupe-chrome" style="margin:0;">
+          <span class="traffic-dot r"></span><span class="traffic-dot y"></span><span class="traffic-dot g"></span>
+        </div>
+        <span id="compare_title" style="font-size:14.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Quick Look 前後對比</span>
+      </div>
+      <button class="icon-btn" onclick="closeCompareModal()" type="button" aria-label="關閉">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="compare-stage" id="compare_stage">
+      <img id="compare_before_img" class="compare-img" alt="原圖">
+      <div class="compare-after-wrap" id="compare_after_wrap">
+        <img id="compare_after_img" class="compare-img" alt="轉檔後">
+      </div>
+      <span class="compare-badge left" id="compare_before_badge">原圖</span>
+      <span class="compare-badge right" id="compare_after_badge">轉檔後</span>
+      <div class="compare-divider" id="compare_divider">
+        <div class="compare-handle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" transform="translate(-4,0)"/>
+            <polyline points="9 18 15 12 9 6" transform="translate(4,0)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dynamic Island Live Activity -->
+<div class="toast-island" id="toast_island" role="status" aria-live="polite">
+  <span class="toast-dot"></span>
+  <span id="toast_text"></span>
+</div>
+
+<!-- Floating Custom Select Popover Root -->
+<div class="apple-select-popover" id="apple_select_popover" role="listbox"></div>
+
+<footer>
+  <strong>Local File Studio Pro</strong> &nbsp;·&nbsp; 100% 本機瀏覽器運算，零資料上傳風險 &nbsp;·&nbsp; 按下 <strong>Ctrl + K</strong> 開啟快速指令面板
+</footer>
+
+<script>
+/* ==========================================================================
+   1. REAL-TIME SILK AURORA, BOKEH PARTICLES & ENERGY PULSE CANVAS
+   ========================================================================== */
+(function initAmbientCanvas() {
+  const canvas = document.getElementById('ambient_canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w = 0, h = 0, dpr = 1;
+
+  const darkPalettes = [
+    [[0, 113, 227], [94, 92, 230], [41, 151, 255]],    // Image Studio
+    [[165, 94, 245], [41, 151, 255], [94, 92, 230]],   // PDF Organizer
+    [[48, 209, 88], [0, 175, 215], [41, 151, 255]]     // PDF Compressor
+  ];
+  const lightPalettes = [
+    [[41, 151, 255], [125, 118, 250], [100, 210, 255]],
+    [[180, 120, 255], [75, 165, 255], [135, 125, 255]],
+    [[52, 199, 89], [64, 200, 224], [41, 151, 255]]
+  ];
+
+  let targetPaletteIdx = 0;
+  let pulseEnergy = 0;
+  window.setAmbientPalette = (idx) => { targetPaletteIdx = idx; pulseEnergy = 0.65; };
+  window.triggerAmbientPulse = () => { pulseEnergy = 1.0; };
+
+  const currentColors = darkPalettes[0].map(c => [...c]);
+  const mouse = { x: 0.5, y: 0.25, tx: 0.5, ty: 0.25 };
+
+  window.addEventListener('pointermove', (e) => {
+    mouse.tx = e.clientX / Math.max(window.innerWidth, 1);
+    mouse.ty = e.clientY / Math.max(window.innerHeight, 1);
+  }, { passive: true });
+
+  // Subtle floating bokeh starlight particles
+  const particles = Array.from({ length: 26 }, () => ({
+    x: Math.random(),
+    y: Math.random(),
+    r: 0.9 + Math.random() * 1.9,
+    vx: (Math.random() - 0.5) * 0.00022,
+    vy: -0.00012 - Math.random() * 0.00024,
+    phase: Math.random() * Math.PI * 2
+  }));
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr * 0.55);
+    canvas.height = Math.floor(h * dpr * 0.55);
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  let t = 0;
+  function frame() {
+    if (!document.hidden) {
+      t += 0.0055;
+      mouse.x += (mouse.tx - mouse.x) * 0.035;
+      mouse.y += (mouse.ty - mouse.y) * 0.035;
+      pulseEnergy *= 0.965;
+
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const targetPal = (isLight ? lightPalettes : darkPalettes)[targetPaletteIdx] || darkPalettes[0];
+
+      for (let i = 0; i < 3; i++) {
+        for (let c = 0; c < 3; c++) {
+          currentColors[i][c] += (targetPal[i][c] - currentColors[i][c]) * 0.04;
+        }
+      }
+
+      const cw = canvas.width, ch = canvas.height;
+      ctx.clearRect(0, 0, cw, ch);
+
+      const boost = 1 + pulseEnergy * 0.35;
+      const orbs = [
+        {
+          x: cw * (0.22 + Math.sin(t * 0.9) * 0.1 + (mouse.x - 0.5) * 0.16),
+          y: ch * (0.14 + Math.cos(t * 0.7) * 0.08 + (mouse.y - 0.5) * 0.11),
+          r: Math.max(cw, ch) * 0.54,
+          a: (isLight ? 0.19 : 0.24) * boost,
+          c: currentColors[0]
+        },
+        {
+          x: cw * (0.78 + Math.cos(t * 0.8) * 0.1 - (mouse.x - 0.5) * 0.13),
+          y: ch * (0.20 + Math.sin(t * 0.65) * 0.08 + (mouse.y - 0.5) * 0.09),
+          r: Math.max(cw, ch) * 0.48,
+          a: (isLight ? 0.15 : 0.18) * boost,
+          c: currentColors[1]
+        },
+        {
+          x: cw * (0.50 + Math.sin(t * 0.55 + 1.5) * 0.14 + (mouse.x - 0.5) * 0.09),
+          y: ch * (0.86 + Math.cos(t * 0.6) * 0.08),
+          r: Math.max(cw, ch) * 0.46,
+          a: (isLight ? 0.12 : 0.15) * boost,
+          c: currentColors[2]
+        }
+      ];
+
+      ctx.globalCompositeOperation = isLight ? 'source-over' : 'screen';
+      for (const o of orbs) {
+        const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+        const rgb = `${Math.round(o.c[0])}, ${Math.round(o.c[1])}, ${Math.round(o.c[2])}`;
+        g.addColorStop(0, `rgba(${rgb}, ${o.a})`);
+        g.addColorStop(0.5, `rgba(${rgb}, ${o.a * 0.34})`);
+        g.addColorStop(1, `rgba(${rgb}, 0)`);
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, cw, ch);
+      }
+
+      // Silk Aurora Ribbon Wave
+      ctx.beginPath();
+      const baseY = ch * 0.28;
+      ctx.moveTo(0, baseY);
+      for (let x = 0; x <= cw; x += Math.max(cw / 18, 16)) {
+        const nx = x / cw;
+        const y = baseY + Math.sin(nx * 4.2 + t * 1.4) * (ch * 0.055) + Math.cos(nx * 2.5 - t) * (ch * 0.03) + (mouse.y - 0.5) * ch * 0.06;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(cw, 0);
+      ctx.lineTo(0, 0);
+      ctx.closePath();
+      const rg = ctx.createLinearGradient(0, 0, cw, baseY * 1.3);
+      const c0 = currentColors[0].map(Math.round).join(',');
+      const c1 = currentColors[1].map(Math.round).join(',');
+      rg.addColorStop(0, `rgba(${c0}, ${isLight ? 0.05 : 0.08})`);
+      rg.addColorStop(0.5, `rgba(${c1}, ${isLight ? 0.06 : 0.1})`);
+      rg.addColorStop(1, `rgba(${c0}, 0)`);
+      ctx.fillStyle = rg;
+      ctx.fill();
+
+      // Subtle floating bokeh starlight
+      for (const p of particles) {
+        p.x = (p.x + p.vx + 1) % 1;
+        p.y = (p.y + p.vy + 1) % 1;
+        const alpha = (0.18 + 0.22 * Math.sin(t * 2.2 + p.phase)) * (isLight ? 0.45 : 0.75);
+        const px = p.x * cw + (mouse.x - 0.5) * 18;
+        const py = p.y * ch + (mouse.y - 0.5) * 14;
+        ctx.beginPath();
+        ctx.arc(px, py, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = isLight ? `rgba(0, 113, 227, ${alpha})` : `rgba(210, 232, 255, ${alpha})`;
+        ctx.fill();
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
     }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 
-    // 2. 分頁切換
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
-    }
+/* ==========================================================================
+   2. LIQUID GLASS POINTER-TRACKING OPTICS
+   ========================================================================== */
+document.addEventListener('pointermove', (e) => {
+  const el = e.target.closest('.liquid-glass');
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+  el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+}, { passive: true });
 
-    function showBookmarkTip() {
-      alert("⭐ 加入書籤秘訣：\n\n1. 在當前視窗按下鍵盤快捷鍵「Ctrl + D」（Mac 請按 Cmd + D）。\n2. 點擊「完成」即可加入瀏覽器書籤列。\n3. 以後只要打開瀏覽器點擊該書籤，就能隨時一鍵即時打開使用！");
-    }
+/* ==========================================================================
+   3. CUSTOM MACOS FROSTED GLASS SELECT POPOVER ENGINE
+   ========================================================================== */
+const selectPopover = document.getElementById('apple_select_popover');
+let activeSelectCtx = null;
+const CHECK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const CHEV_SVG = `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
 
-    // =========================================================
-    // 模組一：圖片轉檔與大小壓縮 (PNG / JPG / HEIC / WEBP)
-    // =========================================================
-    let imageQueue = [];
+function closeAppleSelect() {
+  selectPopover.classList.remove('open');
+  if (activeSelectCtx) {
+    activeSelectCtx.trigger.classList.remove('open');
+    activeSelectCtx.trigger.setAttribute('aria-expanded', 'false');
+    activeSelectCtx = null;
+  }
+}
 
-    const imgDropZone = document.getElementById('img_drop_zone');
-    const imgFileInput = document.getElementById('img_file_input');
+function enhanceAppleSelects() {
+  document.querySelectorAll('select.apple-native-select').forEach(sel => {
+    if (sel.dataset.enhanced) return;
+    sel.dataset.enhanced = '1';
 
-    ['dragenter', 'dragover'].forEach(name => {
-      imgDropZone.addEventListener(name, (e) => { e.preventDefault(); imgDropZone.classList.add('dragover'); });
-    });
-    ['dragleave', 'drop'].forEach(name => {
-      imgDropZone.addEventListener(name, (e) => { e.preventDefault(); imgDropZone.classList.remove('dragover'); });
-    });
-    imgDropZone.addEventListener('drop', (e) => {
-      handleImageFiles(e.dataTransfer.files);
-    });
-    imgFileInput.addEventListener('change', (e) => {
-      handleImageFiles(e.target.files);
-      imgFileInput.value = '';
-    });
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'apple-select-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
 
-    async function handleImageFiles(files) {
-      if (!files || files.length === 0) return;
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'sel-label';
+    const syncLabel = () => {
+      const opt = sel.options[sel.selectedIndex];
+      labelSpan.textContent = opt ? opt.textContent : '';
+    };
+    syncLabel();
+    trigger.appendChild(labelSpan);
+    trigger.insertAdjacentHTML('beforeend', CHEV_SVG);
 
-      for (let file of files) {
-        const id = 'img_' + Math.random().toString(36).substr(2, 9);
-        const isHeic = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+    sel.parentNode.insertBefore(trigger, sel.nextSibling);
+    sel.addEventListener('change', syncLabel);
 
-        imageQueue.push({
-          id,
-          file,
-          name: file.name,
-          size: file.size,
-          isHeic,
-          status: 'ready', // ready, converting, done, error
-          convertedBlob: null,
-          convertedSize: 0,
-          previewUrl: isHeic ? '' : URL.createObjectURL(file)
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (activeSelectCtx && activeSelectCtx.select === sel) {
+        closeAppleSelect();
+        return;
+      }
+      closeAppleSelect();
+      activeSelectCtx = { select: sel, trigger, syncLabel };
+      trigger.classList.add('open');
+      trigger.setAttribute('aria-expanded', 'true');
+
+      selectPopover.innerHTML = '';
+      Array.from(sel.options).forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'apple-select-option' + (opt.value === sel.value ? ' selected' : '');
+        btn.innerHTML = `<span>${escapeHtml(opt.textContent)}</span>${CHECK_SVG}`;
+        btn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          sel.value = opt.value;
+          syncLabel();
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+          closeAppleSelect();
         });
-      }
-
-      renderImageList();
-      document.getElementById('btn_convert_all').disabled = false;
-    }
-
-    function renderImageList() {
-      const container = document.getElementById('img_list');
-      container.innerHTML = '';
-
-      imageQueue.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        card.id = 'card_' + item.id;
-
-        const thumbSrc = item.previewUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="%2394A3B8"><text x="5" y="30" font-size="12">HEIC</text></svg>';
-
-        let statusBadge = '';
-        if (item.status === 'ready') statusBadge = '<span class="tag">待處理</span>';
-        else if (item.status === 'converting') statusBadge = '<span class="tag tag-heic"><span class="spinner" style="display:inline-block;width:10px;height:10px;margin-right:4px;"></span>處理中</span>';
-        else if (item.status === 'done') statusBadge = `<span class="tag tag-success">已完成 (${formatSize(item.convertedSize)})</span>`;
-        else if (item.status === 'error') statusBadge = '<span class="tag" style="background:#EF4444;">失敗</span>';
-
-        card.innerHTML = `
-          <img src="${thumbSrc}" class="item-thumb" id="thumb_${item.id}">
-          <div class="item-info">
-            <div class="item-name">${escapeHtml(item.name)}</div>
-            <div class="item-meta">
-              <span>原始: ${formatSize(item.size)}</span>
-              ${item.isHeic ? '<span class="tag tag-heic">Apple HEIC</span>' : ''}
-              ${statusBadge}
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            ${item.convertedBlob ? `<button class="btn btn-secondary" onclick="downloadSingleImage('${item.id}')">💾 下載</button>` : ''}
-            <button class="icon-btn danger" onclick="removeImage('${item.id}')" title="移除">✕</button>
-          </div>
-        `;
-
-        container.appendChild(card);
+        selectPopover.appendChild(btn);
       });
+
+      const rect = trigger.getBoundingClientRect();
+      selectPopover.style.minWidth = Math.max(rect.width, 200) + 'px';
+      selectPopover.classList.add('open');
+
+      const popH = selectPopover.offsetHeight;
+      const spaceBelow = window.innerHeight - rect.bottom - 14;
+      const top = spaceBelow >= popH || spaceBelow >= 180
+        ? rect.bottom + 6
+        : Math.max(12, rect.top - popH - 6);
+      const left = Math.min(rect.left, window.innerWidth - selectPopover.offsetWidth - 12);
+      selectPopover.style.top = top + 'px';
+      selectPopover.style.left = Math.max(12, left) + 'px';
+    });
+  });
+}
+document.addEventListener('click', closeAppleSelect);
+window.addEventListener('scroll', closeAppleSelect, { passive: true });
+window.addEventListener('resize', closeAppleSelect, { passive: true });
+enhanceAppleSelects();
+
+/* ==========================================================================
+   4. LIVE TELEMETRY BENTO STATS, THEME, SEGMENTED PILL, MODALS & TOAST
+   ========================================================================== */
+let totalProcessedFiles = 0;
+let totalSavedBytes = 0;
+function recordStats(filesDelta, savedBytesDelta) {
+  totalProcessedFiles += filesDelta;
+  totalSavedBytes += Math.max(0, savedBytesDelta);
+  document.getElementById('stat_processed').textContent = `${totalProcessedFiles} 個檔案`;
+  document.getElementById('stat_saved').textContent = formatSize(totalSavedBytes);
+}
+
+let toastTimer = null;
+function showToast(msg, isSuccess = false) {
+  const el = document.getElementById('toast_island');
+  document.getElementById('toast_text').textContent = msg;
+  el.classList.toggle('success', isSuccess);
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme_icon_sun').style.display = theme === 'dark' ? '' : 'none';
+  document.getElementById('theme_icon_moon').style.display = theme === 'light' ? '' : 'none';
+  try { localStorage.setItem('lfs_theme', theme); } catch (_) {}
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  triggerAmbientPulse();
+  showToast(next === 'dark' ? '已切換至深色 Obsidian Pro 外觀' : '已切換至淺色 Alabaster Studio 外觀');
+}
+(function restoreTheme() {
+  try {
+    const saved = localStorage.getItem('lfs_theme');
+    if (saved === 'light' || saved === 'dark') applyTheme(saved);
+  } catch (_) {}
+})();
+
+function updateTabIndicator() {
+  const activeBtn = document.querySelector('.tab-btn.active');
+  const indicator = document.getElementById('tab_indicator');
+  if (!activeBtn || !indicator) return;
+  indicator.style.width = activeBtn.offsetWidth + 'px';
+  indicator.style.transform = `translateX(${activeBtn.offsetLeft - 5}px)`;
+}
+window.addEventListener('load', updateTabIndicator);
+window.addEventListener('resize', updateTabIndicator);
+
+function updateQualitySlider(slider) {
+  const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+  slider.style.setProperty('--slider-pct', pct + '%');
+  document.getElementById('img_quality_val').textContent = slider.value + '%';
+}
+updateQualitySlider(document.getElementById('img_quality_slider'));
+
+function showBookmarkTip() { document.getElementById('bookmark_modal').classList.add('open'); }
+function closeBookmarkTip() { document.getElementById('bookmark_modal').classList.remove('open'); }
+
+function openCmdPalette() {
+  document.getElementById('cmd_modal').classList.add('open');
+  const inp = document.getElementById('cmd_search_input');
+  inp.value = '';
+  filterCmdItems('');
+  setTimeout(() => inp.focus(), 60);
+}
+function closeCmdPalette() { document.getElementById('cmd_modal').classList.remove('open'); }
+function runCmd(fn) { closeCmdPalette(); fn(); }
+function filterCmdItems(q) {
+  const s = (q || '').trim().toLowerCase();
+  document.querySelectorAll('#cmd_list .cmd-item').forEach(btn => {
+    const text = (btn.textContent + ' ' + (btn.dataset.kw || '')).toLowerCase();
+    btn.style.display = !s || text.includes(s) ? 'flex' : 'none';
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    openCmdPalette();
+  } else if (e.key === 'Escape') {
+    closeBookmarkTip();
+    closeCmdPalette();
+    closeCompareModal();
+    closeAppleSelect();
+  }
+});
+
+/* Quick Look Before / After Split Slider */
+const compareStage = document.getElementById('compare_stage');
+const compareAfterWrap = document.getElementById('compare_after_wrap');
+const compareDivider = document.getElementById('compare_divider');
+let isDraggingCompare = false;
+
+function setComparePos(clientX) {
+  const rect = compareStage.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(100, ((clientX - rect.left) / Math.max(rect.width, 1)) * 100));
+  compareAfterWrap.style.clipPath = `inset(0 0 0 ${pct}%)`;
+  compareDivider.style.left = pct + '%';
+}
+compareStage.addEventListener('pointerdown', (e) => {
+  isDraggingCompare = true;
+  compareStage.setPointerCapture(e.pointerId);
+  setComparePos(e.clientX);
+});
+compareStage.addEventListener('pointermove', (e) => {
+  if (isDraggingCompare) setComparePos(e.clientX);
+});
+compareStage.addEventListener('pointerup', () => { isDraggingCompare = false; });
+
+function openCompareModal(id) {
+  const item = imageQueue.find(i => i.id === id);
+  if (!item || !item.convertedBlob) return;
+  const beforeUrl = item.origPreviewUrl || item.previewUrl;
+  document.getElementById('compare_before_img').src = beforeUrl;
+  document.getElementById('compare_after_img').src = item.previewUrl;
+  document.getElementById('compare_title').textContent = `Quick Look 前後對比 — ${item.name}`;
+  document.getElementById('compare_before_badge').textContent = `原圖 · ${formatSize(item.size)}`;
+  document.getElementById('compare_after_badge').textContent = `轉檔後 · ${formatSize(item.convertedSize)}`;
+  compareAfterWrap.style.clipPath = 'inset(0 0 0 50%)';
+  compareDivider.style.left = '50%';
+  document.getElementById('compare_modal').classList.add('open');
+}
+function closeCompareModal() { document.getElementById('compare_modal').classList.remove('open'); }
+
+function selectCompressTier(card) {
+  document.querySelectorAll('#pdf_tier_grid .tier-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('pdf_compress_profile').value = card.dataset.profile;
+}
+
+/* ==========================================================================
+   5. CORE STUDIO LOGIC (100% PRESERVED)
+   ========================================================================== */
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
+}
+
+function switchTab(btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => {
+    el.classList.remove('active');
+    el.setAttribute('aria-selected', 'false');
+  });
+  document.getElementById(btn.dataset.tab).classList.add('active');
+  if (typeof hideZoomTooltip === 'function') hideZoomTooltip();
+  if (typeof hideImgZoom === 'function') hideImgZoom();
+  closeAppleSelect();
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  updateTabIndicator();
+  if (window.setAmbientPalette && btn.dataset.palette !== undefined) {
+    window.setAmbientPalette(parseInt(btn.dataset.palette, 10));
+  }
+}
+
+const SVG_LOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+const SVG_UNLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`;
+const SVG_DOWNLOAD = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+const SVG_COMPARE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/></svg>`;
+const SVG_CLOSE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+const SVG_ROTATE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>`;
+const SVG_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+const SVG_BOLT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5h6.5L10 22l9.5-11.5H13L13 2z"/></svg>`;
+const SVG_SEARCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
+
+/* ---------- IMAGE CONVERTER ---------- */
+let imageQueue = [];
+let customAspectRatio = null;
+let isRatioLocked = true;
+
+const imgDropZone = document.getElementById('img_drop_zone');
+const imgFileInput = document.getElementById('img_file_input');
+
+['dragenter', 'dragover'].forEach(n => imgDropZone.addEventListener(n, e => { e.preventDefault(); imgDropZone.classList.add('dragover'); }));
+['dragleave', 'drop'].forEach(n => imgDropZone.addEventListener(n, e => { e.preventDefault(); imgDropZone.classList.remove('dragover'); }));
+imgDropZone.addEventListener('drop', e => handleImageFiles(e.dataTransfer.files));
+imgFileInput.addEventListener('change', e => { handleImageFiles(e.target.files); imgFileInput.value = ''; });
+
+function onFormatChange() {
+  const fmt = document.getElementById('img_target_format').value;
+  document.getElementById('quality_group').style.opacity = fmt === 'image/png' ? '0.38' : '1';
+}
+function onSizeTargetChange() {
+  const v = document.getElementById('img_size_target').value;
+  document.getElementById('target_custom_row').style.display = v === 'custom' ? '' : 'none';
+}
+function getTargetBytes(item) {
+  const v = document.getElementById('img_size_target').value;
+  if (v === 'none') return null;
+  if (v.startsWith('pct_')) return Math.max(1024, item.size * parseInt(v.slice(4)) / 100);
+  if (v.startsWith('mb_')) return parseInt(v.slice(3)) * 1024 * 1024;
+  if (v.startsWith('kb_')) return parseInt(v.slice(3)) * 1024;
+  if (v === 'custom') return Math.max(10 * 1024, (parseFloat(document.getElementById('target_custom_mb').value) || 1) * 1024 * 1024);
+  return null;
+}
+function onResizeModeChange() {
+  const mode = document.getElementById('img_resize_mode').value;
+  const row = document.getElementById('custom_size_row');
+  if (mode === 'custom') {
+    row.classList.add('visible');
+    const first = imageQueue.find(i => i.origW);
+    if (first && !document.getElementById('custom_w').value) {
+      document.getElementById('custom_w').value = first.origW;
+      document.getElementById('custom_h').value = first.origH;
+      customAspectRatio = first.origW / first.origH;
     }
+  } else {
+    row.classList.remove('visible');
+  }
+}
+function toggleLockRatio() {
+  isRatioLocked = !isRatioLocked;
+  const btn = document.getElementById('lock_ratio_btn');
+  btn.innerHTML = isRatioLocked ? SVG_LOCK : SVG_UNLOCK;
+  btn.classList.toggle('locked', isRatioLocked);
+  if (isRatioLocked) {
+    const w = parseFloat(document.getElementById('custom_w').value);
+    const h = parseFloat(document.getElementById('custom_h').value);
+    if (w && h) customAspectRatio = w / h;
+  }
+}
+function onCustomWChange() {
+  if (!isRatioLocked || !customAspectRatio) return;
+  const w = parseFloat(document.getElementById('custom_w').value);
+  if (w) document.getElementById('custom_h').value = Math.round(w / customAspectRatio);
+}
+function onCustomHChange() {
+  if (!isRatioLocked || !customAspectRatio) return;
+  const h = parseFloat(document.getElementById('custom_h').value);
+  if (h) document.getElementById('custom_w').value = Math.round(h * customAspectRatio);
+}
 
-    function removeImage(id) {
-      imageQueue = imageQueue.filter(item => item.id !== id);
-      renderImageList();
-      if (imageQueue.length === 0) {
-        document.getElementById('btn_convert_all').disabled = true;
-        document.getElementById('btn_zip_all').style.display = 'none';
-      }
-    }
+let heicChain = Promise.resolve();
+async function handleImageFiles(fileList) {
+  const files = Array.from(fileList || []).filter(f =>
+    /\.(heic|heif|png|jpe?g|webp|bmp)$/i.test(f.name) || f.type.startsWith('image/')
+  );
+  if (!files.length) return;
+  const added = [];
+  for (const file of files) {
+    const id = 'img_' + Math.random().toString(36).substr(2, 9);
+    const isHeic = /\.(heic|heif)$/i.test(file.name);
+    const initialUrl = isHeic ? '' : URL.createObjectURL(file);
+    const item = {
+      id, file, name: file.name, size: file.size, isHeic,
+      status: 'ready', convertedBlob: null, convertedSize: 0,
+      origPreviewUrl: initialUrl,
+      previewUrl: initialUrl,
+      origW: null, origH: null, heicBlob: null
+    };
+    imageQueue.push(item);
+    added.push(item);
+  }
+  renderImageList();
+  document.getElementById('btn_convert_all').disabled = false;
+  triggerAmbientPulse();
+  showToast(`已載入 ${added.length} 張圖片`);
 
-    function clearImageList() {
-      imageQueue = [];
-      renderImageList();
-      document.getElementById('btn_convert_all').disabled = true;
-      document.getElementById('btn_zip_all').style.display = 'none';
-    }
-
-    async function processAllImages() {
-      const targetMime = document.getElementById('img_target_format').value;
-      const quality = parseInt(document.getElementById('img_quality_slider').value) / 100.0;
-      const resizeMode = document.getElementById('img_resize_mode').value;
-      const convertBtn = document.getElementById('btn_convert_all');
-
-      convertBtn.disabled = true;
-      convertBtn.textContent = '轉檔中...';
-
-      for (let item of imageQueue) {
-        if (item.status === 'done') continue;
-        item.status = 'converting';
-        renderImageList();
-
+  for (const item of added) {
+    if (!item.isHeic) {
+      getImageDimensions(item.file).then(d => { item.origW = d.w; item.origH = d.h; renderImageList(); }).catch(() => {});
+    } else {
+      heicChain = heicChain.then(async () => {
+        if (!imageQueue.includes(item)) return;
         try {
-          let sourceBlob = item.file;
+          let b = await heic2any({ blob: item.file, toType: 'image/jpeg', quality: 0.92 });
+          if (Array.isArray(b)) b = b[0];
+          item.heicBlob = b;
+          const u = URL.createObjectURL(b);
+          item.origPreviewUrl = u;
+          if (!item.convertedBlob) item.previewUrl = u;
+          const d = await getImageDimensions(b);
+          item.origW = d.w; item.origH = d.h;
+          renderImageList();
+        } catch (e) { console.warn('HEIC 預覽失敗', item.name, e); }
+      });
+    }
+  }
+}
 
-          // 1. 若是 Apple HEIC，呼叫 heic2any 轉為標準 Blob
-          if (item.isHeic) {
-            sourceBlob = await heic2any({
-              blob: item.file,
-              toType: 'image/jpeg',
-              quality: 0.95
-            });
-            if (Array.isArray(sourceBlob)) sourceBlob = sourceBlob[0];
-          }
+const imgZoomTip = document.getElementById('img_zoom_tooltip');
+const imgZoomImg = document.getElementById('img_zoom_img');
+const imgZoomLabel = document.getElementById('img_zoom_label');
+let imgZoomToken = 0;
 
-          // 2. 透過 Canvas 調校尺寸與壓縮品質
-          const convertedBlob = await convertAndCompressImageBlob(sourceBlob, targetMime, quality, resizeMode);
+function hideImgZoom() { imgZoomToken++; imgZoomTip.classList.remove('visible'); }
+function showImgZoom(item, mx) {
+  if (!item || !item.previewUrl) return;
+  const token = ++imgZoomToken;
+  const maxW = Math.min(window.innerWidth * 0.5, 1100);
+  const maxH = window.innerHeight * 0.84 - 52;
+  imgZoomImg.style.maxWidth = maxW + 'px';
+  imgZoomImg.style.maxHeight = maxH + 'px';
+  imgZoomImg.onload = () => {
+    if (token !== imgZoomToken) return;
+    const dims = item.status === 'done' && item.outW ? `${item.outW}×${item.outH}px` : (item.origW ? `${item.origW}×${item.origH}px` : '');
+    imgZoomLabel.textContent = `${item.status === 'done' ? '轉檔後' : '原圖'} · ${dims} · ${item.name}`;
+    imgZoomTip.classList.add('visible');
+    const TW = imgZoomTip.offsetWidth, TH = imgZoomTip.offsetHeight, GAP = 20;
+    imgZoomTip.style.left = (mx > window.innerWidth / 2 ? GAP : window.innerWidth - TW - GAP) + 'px';
+    imgZoomTip.style.top = Math.max(GAP, (window.innerHeight - TH) / 2) + 'px';
+  };
+  imgZoomImg.src = item.previewUrl;
+}
 
-          item.convertedBlob = convertedBlob;
-          item.convertedSize = convertedBlob.size;
-          item.previewUrl = URL.createObjectURL(convertedBlob);
-          item.status = 'done';
-        } catch (err) {
-          console.error('轉檔失敗:', item.name, err);
-          item.status = 'error';
-        }
+const imgListEl = document.getElementById('img_list');
+imgListEl.addEventListener('mouseover', e => {
+  const t = e.target.closest('.item-thumb');
+  if (t) showImgZoom(imageQueue.find(i => i.id === t.dataset.id), e.clientX);
+});
+imgListEl.addEventListener('mouseout', e => {
+  if (e.target.closest('.item-thumb')) hideImgZoom();
+});
 
-        renderImageList();
-      }
+document.addEventListener('paste', e => {
+  if (!document.getElementById('tab_image').classList.contains('active')) return;
+  const files = Array.from(e.clipboardData?.files || []);
+  if (files.length) handleImageFiles(files);
+});
 
-      convertBtn.disabled = false;
-      convertBtn.textContent = '⚡ 開始轉檔與壓縮';
+const tabImageEl = document.getElementById('tab_image');
+tabImageEl.addEventListener('dragover', e => e.preventDefault());
+tabImageEl.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.target.closest('#img_drop_zone')) return;
+  handleImageFiles(e.dataTransfer.files);
+});
 
-      const hasDone = imageQueue.some(i => i.status === 'done');
-      if (hasDone) {
-        document.getElementById('btn_zip_all').style.display = 'inline-flex';
-      }
+function getImageDimensions(file) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => { URL.revokeObjectURL(url); res({ w: img.width, h: img.height }); };
+    img.onerror = rej;
+    img.src = url;
+  });
+}
+
+function updateImageListHeader() {
+  const header = document.getElementById('img_list_header');
+  const badge = document.getElementById('img_count_badge');
+  if (imageQueue.length > 0) {
+    header.style.display = 'flex';
+    badge.textContent = `${imageQueue.length} 張`;
+  } else {
+    header.style.display = 'none';
+  }
+}
+
+function renderImageList() {
+  const container = document.getElementById('img_list');
+  container.innerHTML = '';
+  imageQueue.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'item-card liquid-glass';
+    if (item.status === 'done') card.classList.add('status-done');
+    else if (item.status === 'error') card.classList.add('status-error');
+    else if (item.status === 'converting') card.classList.add('status-converting');
+    card.id = 'card_' + item.id;
+
+    const thumbSrc = item.previewUrl ||
+      `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="58" height="58"><rect width="58" height="58" fill="%23141418" rx="12"/><text x="29" y="33" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="11" fill="%2386868b">HEIC</text></svg>`;
+
+    let statusHtml = '';
+    if (item.status === 'ready') statusHtml = '<span class="tag tag-neutral">待處理</span>';
+    else if (item.status === 'converting') statusHtml = `<span class="tag tag-active"><span class="spinner" style="width:10px;height:10px;border-width:2px;"></span>處理中</span>`;
+    else if (item.status === 'done') {
+      const saved = Math.round((1 - item.convertedSize / item.size) * 100);
+      const miss = item.targetBytes && item.convertedSize > item.targetBytes * 1.02;
+      statusHtml = `<span class="tag tag-success">✓ ${item.outW}×${item.outH}px · ${formatSize(item.convertedSize)}</span>` +
+        `<span class="tag ${saved >= 0 ? 'tag-success' : 'tag-active'}">${saved >= 0 ? '縮小 ' + saved + '%' : '變大 ' + (-saved) + '%'}</span>` +
+        (miss ? '<span class="tag tag-danger">未達目標</span>' : '');
+    } else if (item.status === 'error') {
+      statusHtml = '<span class="tag tag-danger">✕ 失敗</span>';
     }
 
-    function convertAndCompressImageBlob(blob, targetMime, quality, resizeMode) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        const url = URL.createObjectURL(blob);
-        img.onload = () => {
-          URL.revokeObjectURL(url);
-          let w = img.width;
-          let h = img.height;
+    const dimInfo = item.origW ? `${item.origW}×${item.origH}px · ` : '';
+    card.innerHTML = `
+      <div class="rim-glow"></div>
+      <img src="${thumbSrc}" class="item-thumb" id="thumb_${item.id}" data-id="${item.id}" alt="">
+      <div class="item-info">
+        <div class="item-name">${escapeHtml(item.name)}</div>
+        <div class="item-meta">
+          <span>${dimInfo}${formatSize(item.size)}</span>
+          ${item.isHeic ? '<span class="tag tag-heic">Apple HEIC</span>' : ''}
+          ${statusHtml}
+        </div>
+      </div>
+      <div class="item-actions">
+        ${item.convertedBlob ? `<button class="btn btn-secondary btn-sm" onclick="openCompareModal('${item.id}')" type="button" title="Quick Look 前後對比">${SVG_COMPARE}<span>對比</span></button>` : ''}
+        ${item.convertedBlob ? `<button class="btn btn-secondary btn-sm" onclick="downloadSingleImage('${item.id}')" type="button">${SVG_DOWNLOAD}<span>下載</span></button>` : ''}
+        <button class="icon-btn danger" onclick="removeImage('${item.id}')" title="移除" type="button">${SVG_CLOSE}</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+  updateImageListHeader();
+}
 
-          // 尺寸調整
-          if (resizeMode === 'scale_75') { w = Math.round(w * 0.75); h = Math.round(h * 0.75); }
-          else if (resizeMode === 'scale_50') { w = Math.round(w * 0.5); h = Math.round(h * 0.5); }
-          else if (resizeMode !== 'original') {
-            const maxW = parseInt(resizeMode);
-            if (w > maxW) {
-              h = Math.round((h * maxW) / w);
-              w = maxW;
+function removeImage(id) {
+  imageQueue = imageQueue.filter(i => i.id !== id);
+  renderImageList();
+  if (!imageQueue.length) {
+    document.getElementById('btn_convert_all').disabled = true;
+    document.getElementById('btn_zip_all').style.display = 'none';
+  }
+}
+function clearImageList() {
+  if (!imageQueue.length) return;
+  imageQueue = [];
+  renderImageList();
+  document.getElementById('btn_convert_all').disabled = true;
+  document.getElementById('btn_zip_all').style.display = 'none';
+  showToast('已清空圖片清單');
+}
+
+async function processAllImages() {
+  const targetMime = document.getElementById('img_target_format').value;
+  const quality = parseInt(document.getElementById('img_quality_slider').value) / 100;
+  const resizeMode = document.getElementById('img_resize_mode').value;
+  const customW = parseInt(document.getElementById('custom_w').value) || null;
+  const customH = parseInt(document.getElementById('custom_h').value) || null;
+  const lockRatio = isRatioLocked;
+  const convertBtn = document.getElementById('btn_convert_all');
+  const batchStrip = document.getElementById('img_batch_progress');
+  const batchBar = document.getElementById('img_batch_bar');
+  const batchPct = document.getElementById('img_batch_pct');
+  const batchLabel = document.getElementById('img_batch_label');
+
+  convertBtn.disabled = true;
+  convertBtn.innerHTML = '<span class="spinner"></span><span>轉檔中...</span>';
+  if (imageQueue.length > 1) {
+    batchStrip.classList.add('visible');
+    batchBar.style.width = '0%';
+    batchPct.textContent = '0%';
+  }
+
+  let doneCount = 0;
+  let savedDelta = 0;
+  const total = imageQueue.length;
+
+  for (let idx = 0; idx < total; idx++) {
+    const item = imageQueue[idx];
+    item.status = 'converting';
+    renderImageList();
+    if (total > 1) batchLabel.textContent = `正在轉檔第 ${idx + 1} / ${total} 張：${item.name}`;
+    try {
+      let sourceBlob = item.file;
+      if (item.isHeic && item.heicBlob) {
+        sourceBlob = item.heicBlob;
+      } else if (item.isHeic) {
+        sourceBlob = await heic2any({ blob: item.file, toType: 'image/jpeg', quality: 0.95 });
+        if (Array.isArray(sourceBlob)) sourceBlob = sourceBlob[0];
+        if (!item.origPreviewUrl) item.origPreviewUrl = URL.createObjectURL(sourceBlob);
+      }
+      const convertedBlob = await convertAndCompressImageBlob(sourceBlob, targetMime, quality, resizeMode, customW, customH, lockRatio, getTargetBytes(item));
+      item.targetBytes = getTargetBytes(item);
+      item.convertedBlob = convertedBlob;
+      item.convertedSize = convertedBlob.size;
+      item.outW = convertedBlob.outW;
+      item.outH = convertedBlob.outH;
+      item.previewUrl = URL.createObjectURL(convertedBlob);
+      item.status = 'done';
+      doneCount++;
+      savedDelta += Math.max(0, item.size - item.convertedSize);
+    } catch (err) {
+      console.error('轉檔失敗:', item.name, err);
+      item.status = 'error';
+    }
+    if (total > 1) {
+      const pct = Math.round(((idx + 1) / total) * 100);
+      batchBar.style.width = pct + '%';
+      batchPct.textContent = pct + '%';
+    }
+    renderImageList();
+  }
+
+  convertBtn.disabled = false;
+  convertBtn.innerHTML = `${SVG_BOLT}<span>開始轉檔</span>`;
+  setTimeout(() => batchStrip.classList.remove('visible'), 500);
+
+  if (doneCount > 0) {
+    recordStats(doneCount, savedDelta);
+    triggerAmbientPulse();
+    document.getElementById('btn_zip_all').style.display = 'inline-flex';
+    showToast(`已完成 ${doneCount} 張圖片轉檔`, true);
+  }
+}
+
+function convertAndCompressImageBlob(blob, targetMime, quality, resizeMode, customW, customH, lockRatio, targetBytes) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(blob);
+    img.onload = async () => {
+      URL.revokeObjectURL(url);
+      let w = img.width, h = img.height;
+      if (resizeMode === 'custom' && customW && customH) {
+        if (lockRatio) {
+          const f = Math.min(customW / w, customH / h);
+          w = Math.max(1, Math.round(w * f)); h = Math.max(1, Math.round(h * f));
+        } else { w = customW; h = customH; }
+      } else if (resizeMode === 'custom' && customW) {
+        h = Math.round((h * customW) / w); w = customW;
+      } else if (resizeMode === 'scale_75') {
+        w = Math.round(w * 0.75); h = Math.round(h * 0.75);
+      } else if (resizeMode === 'scale_50') {
+        w = Math.round(w * 0.5); h = Math.round(h * 0.5);
+      } else if (resizeMode !== 'original') {
+        const maxW = parseInt(resizeMode);
+        if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+      }
+
+      const renderAt = (sc) => {
+        const cw = Math.max(1, Math.round(w * sc)), ch = Math.max(1, Math.round(h * sc));
+        const c = document.createElement('canvas');
+        c.width = cw; c.height = ch;
+        const ctx = c.getContext('2d');
+        if (targetMime === 'image/jpeg') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cw, ch); }
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, cw, ch);
+        return c;
+      };
+      const toBlobAsync = (c, q) => new Promise(res => c.toBlob(res, targetMime, q));
+      const finish = (b, c) => { if (!b) return reject(new Error('Canvas 轉檔失敗')); b.outW = c.width; b.outH = c.height; resolve(b); };
+
+      try {
+        let c = renderAt(1);
+        let best = await toBlobAsync(c, quality);
+        if (!targetBytes || best.size <= targetBytes) return finish(best, c);
+        if (targetMime === 'image/png') {
+          let lo = 0.05, hi = 1, bestC = null, bestB = null;
+          for (let i = 0; i < 9; i++) {
+            const mid = (lo + hi) / 2;
+            const cc = renderAt(mid), bb = await toBlobAsync(cc, 1);
+            if (bb.size <= targetBytes) { bestC = cc; bestB = bb; lo = mid; } else hi = mid;
+          }
+          if (!bestB) { bestC = renderAt(0.05); bestB = await toBlobAsync(bestC, 1); }
+          return finish(bestB, bestC);
+        }
+        const Q_MIN = Math.min(0.4, quality);
+        let scale = 1;
+        for (let round = 0; round < 14; round++) {
+          c = renderAt(scale);
+          const atMin = await toBlobAsync(c, Q_MIN);
+          if (atMin.size <= targetBytes) {
+            let lo = Q_MIN, hi = quality, bestB2 = atMin;
+            for (let i = 0; i < 7; i++) {
+              const mid = (lo + hi) / 2;
+              const bb = await toBlobAsync(c, mid);
+              if (bb.size <= targetBytes) { bestB2 = bb; lo = mid; } else hi = mid;
             }
+            return finish(bestB2, c);
           }
-
-          const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext('2d');
-
-          // 若目標為 JPEG，先填白色背景避免 PNG 透明變黑
-          if (targetMime === 'image/jpeg') {
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, w, h);
-          }
-
-          ctx.drawImage(img, 0, 0, w, h);
-
-          canvas.toBlob((outBlob) => {
-            if (outBlob) resolve(outBlob);
-            else reject(new Error('Canvas 轉檔失敗'));
-          }, targetMime, quality);
-        };
-        img.onerror = reject;
-        img.src = url;
-      });
-    }
-
-    function downloadSingleImage(id) {
-      const item = imageQueue.find(i => i.id === id);
-      if (!item || !item.convertedBlob) return;
-
-      const ext = document.getElementById('img_target_format').value.split('/')[1].replace('jpeg', 'jpg');
-      const baseName = item.name.substring(0, item.name.lastIndexOf('.')) || item.name;
-      const downloadName = `${baseName}_converted.${ext}`;
-
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(item.convertedBlob);
-      a.download = downloadName;
-      a.click();
-    }
-
-    async function downloadAllZip() {
-      const zip = new JSZip();
-      const ext = document.getElementById('img_target_format').value.split('/')[1].replace('jpeg', 'jpg');
-
-      imageQueue.forEach((item, index) => {
-        if (item.convertedBlob) {
-          const baseName = item.name.substring(0, item.name.lastIndexOf('.')) || item.name;
-          zip.file(`${baseName}_${index + 1}.${ext}`, item.convertedBlob);
+          if (scale <= 0.1) return finish(atMin, c);
+          scale *= 0.85;
         }
-      });
+        finish(await toBlobAsync(c, Q_MIN), c);
+      } catch (e) { reject(e); }
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
 
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(zipBlob);
-      a.download = `Converted_Images_${new Date().toISOString().slice(0,10)}.zip`;
-      a.click();
+function downloadSingleImage(id) {
+  const item = imageQueue.find(i => i.id === id);
+  if (!item || !item.convertedBlob) return;
+  const ext = document.getElementById('img_target_format').value.split('/')[1].replace('jpeg', 'jpg');
+  const base = item.name.substring(0, item.name.lastIndexOf('.')) || item.name;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(item.convertedBlob);
+  a.download = `${base}_converted.${ext}`;
+  a.click();
+}
+
+async function downloadAllZip() {
+  const zip = new JSZip();
+  const ext = document.getElementById('img_target_format').value.split('/')[1].replace('jpeg', 'jpg');
+  imageQueue.forEach((item, idx) => {
+    if (item.convertedBlob) {
+      const base = item.name.substring(0, item.name.lastIndexOf('.')) || item.name;
+      zip.file(`${base}_${idx + 1}.${ext}`, item.convertedBlob);
     }
+  });
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = `Converted_Images_${new Date().toISOString().slice(0, 10)}.zip`;
+  a.click();
+  showToast('ZIP 壓縮檔已開始下載', true);
+}
 
+/* ---------- PDF PAGE ORGANIZER ---------- */
+let pdfPagesList = [];
+let sortableInstance = null;
+const hqThumbCache = new Map();
+const pdfDropZone = document.getElementById('pdf_drop_zone');
+const pdfFileInput = document.getElementById('pdf_file_input');
+const zoomTooltip = document.getElementById('pdf_zoom_tooltip');
+const zoomCanvas = document.getElementById('pdf_zoom_canvas');
+const zoomLabel = document.getElementById('pdf_zoom_label');
 
-    // =========================================================
-    // 模組二：PDF 視覺化頁面編排、增頁與刪頁
-    // =========================================================
-    let pdfPagesList = []; // 儲存 { id, srcPdfBytes, pageIndex, rotation, canvasThumb }
-    let sortableInstance = null;
+['dragenter', 'dragover'].forEach(n => pdfDropZone.addEventListener(n, e => { e.preventDefault(); pdfDropZone.classList.add('dragover'); }));
+['dragleave', 'drop'].forEach(n => pdfDropZone.addEventListener(n, e => { e.preventDefault(); pdfDropZone.classList.remove('dragover'); }));
+pdfDropZone.addEventListener('drop', async e => {
+  const fs = Array.from(e.dataTransfer.files).filter(f => /\.pdf$/i.test(f.name));
+  if (fs.length) {
+    await loadInitialPdf(fs[0]);
+    if (fs.length > 1) await appendPdfFiles(fs.slice(1));
+  }
+});
+pdfFileInput.addEventListener('change', async e => {
+  const fs = Array.from(e.target.files);
+  pdfFileInput.value = '';
+  if (fs.length) {
+    await loadInitialPdf(fs[0]);
+    if (fs.length > 1) await appendPdfFiles(fs.slice(1));
+  }
+});
 
-    const pdfDropZone = document.getElementById('pdf_drop_zone');
-    const pdfFileInput = document.getElementById('pdf_file_input');
-
-    ['dragenter', 'dragover'].forEach(name => {
-      pdfDropZone.addEventListener(name, (e) => { e.preventDefault(); pdfDropZone.classList.add('dragover'); });
+async function loadInitialPdf(file) {
+  pdfPagesList = [];
+  hqThumbCache.clear();
+  await appendPdfFile(file);
+  document.getElementById('pdf_ctrl_bar').style.display = 'flex';
+  initSortable();
+}
+async function appendPdfFiles(fileList) {
+  const files = Array.from(fileList);
+  document.getElementById('pdf_append_input').value = '';
+  for (let f of files) await appendPdfFile(f);
+}
+async function appendPdfFile(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdfBytes = new Uint8Array(arrayBuffer);
+  const pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.slice() }).promise;
+  const numPages = pdfDoc.numPages;
+  for (let i = 1; i <= numPages; i++) {
+    const page = await pdfDoc.getPage(i);
+    const thumbCanvas = await renderThumb(page, 0);
+    const pageId = 'page_' + Math.random().toString(36).substr(2, 9);
+    pdfPagesList.push({
+      id: pageId, srcPdfBytes: pdfBytes, pageIndex: i - 1,
+      rotation: 0, canvasThumb: thumbCanvas, sourceFileName: file.name,
+      pageNum: i, totalPages: numPages, pdfDoc
     });
-    ['dragleave', 'drop'].forEach(name => {
-      pdfDropZone.addEventListener(name, (e) => { e.preventDefault(); pdfDropZone.classList.remove('dragover'); });
-    });
-    pdfDropZone.addEventListener('drop', (e) => {
-      if (e.dataTransfer.files.length > 0) loadInitialPdf(e.dataTransfer.files[0]);
-    });
-    pdfFileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) loadInitialPdf(e.target.files[0]);
-      pdfFileInput.value = '';
-    });
-
-    async function loadInitialPdf(file) {
-      pdfPagesList = [];
-      await appendPdfFile(file);
-      document.getElementById('pdf_ctrl_bar').style.display = 'flex';
-      initSortable();
-    }
-
-    async function appendPdfFiles(files) {
-      for (let file of files) {
-        await appendPdfFile(file);
-      }
-      document.getElementById('pdf_append_input').value = '';
-    }
-
-    async function appendPdfFile(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdfBytes = new Uint8Array(arrayBuffer);
-
-      // 使用 PDF.js 渲染縮圖
-      const pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes.slice() }).promise;
-      const numPages = pdfDoc.numPages;
-
-      for (let i = 1; i <= numPages; i++) {
-        const page = await pdfDoc.getPage(i);
-        const viewport = page.getViewport({ scale: 0.35 });
-
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext('2d');
-
-        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-
-        pdfPagesList.push({
-          id: 'page_' + Math.random().toString(36).substr(2, 9),
-          srcPdfBytes: pdfBytes,
-          pageIndex: i - 1, // 0-based
-          rotation: 0,
-          canvasThumb: canvas,
-          sourceFileName: file.name
-        });
-      }
-
-      renderPdfGrid();
-    }
-
-    function initSortable() {
-      const grid = document.getElementById('pdf_pages_grid');
-      if (sortableInstance) sortableInstance.destroy();
-
-      sortableInstance = new Sortable(grid, {
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        chosenClass: 'sortable-chosen',
-        onEnd: (evt) => {
-          const item = pdfPagesList.splice(evt.oldIndex, 1)[0];
-          pdfPagesList.splice(evt.newIndex, 0, item);
-          updatePageNumbers();
-        }
-      });
-    }
-
-    function renderPdfGrid() {
-      const grid = document.getElementById('pdf_pages_grid');
-      grid.innerHTML = '';
-
-      pdfPagesList.forEach((p, idx) => {
-        const card = document.createElement('div');
-        card.className = 'page-card';
-        card.id = p.id;
-
-        const previewDiv = document.createElement('div');
-        previewDiv.className = 'page-preview';
-        p.canvasThumb.style.transform = `rotate(${p.rotation}deg)`;
-        p.canvasThumb.style.transition = 'transform 0.2s';
-        previewDiv.appendChild(p.canvasThumb);
-
-        const footer = document.createElement('div');
-        footer.className = 'page-card-footer';
-        footer.innerHTML = `
-          <span class="page-num" id="pnum_${p.id}">#${idx + 1}</span>
-          <div class="page-actions">
-            <button class="icon-btn" onclick="rotatePage('${p.id}', 90)" title="順時針旋轉 90°">🔄</button>
-            <button class="icon-btn danger" onclick="deletePage('${p.id}')" title="刪除此頁">🗑️</button>
-          </div>
-        `;
-
-        card.appendChild(previewDiv);
-        card.appendChild(footer);
-        grid.appendChild(card);
-      });
-
+  }
+  renderPdfGrid();
+  triggerAmbientPulse();
+  showToast(`已載入 ${file.name}（${numPages} 頁）`);
+}
+async function renderThumb(page, extraRot) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const rot = ((page.rotate || 0) + extraRot) % 360;
+  const base = page.getViewport({ scale: 1, rotation: rot });
+  const scale = (300 * dpr) / Math.max(base.width, 1);
+  const viewport = page.getViewport({ scale, rotation: rot });
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.floor(viewport.width);
+  canvas.height = Math.floor(viewport.height);
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  await page.render({ canvasContext: ctx, viewport }).promise;
+  return canvas;
+}
+function initSortable() {
+  const grid = document.getElementById('pdf_pages_grid');
+  if (sortableInstance) sortableInstance.destroy();
+  sortableInstance = new Sortable(grid, {
+    animation: 220,
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    onEnd: evt => {
+      const item = pdfPagesList.splice(evt.oldIndex, 1)[0];
+      pdfPagesList.splice(evt.newIndex, 0, item);
       updatePageNumbers();
     }
+  });
+}
+function renderPdfGrid() {
+  const grid = document.getElementById('pdf_pages_grid');
+  grid.innerHTML = '';
+  pdfPagesList.forEach((p, idx) => {
+    const card = document.createElement('div');
+    card.className = 'page-card liquid-glass';
+    card.id = p.id;
+    const rim = document.createElement('div');
+    rim.className = 'rim-glow';
+    card.appendChild(rim);
 
-    function updatePageNumbers() {
-      pdfPagesList.forEach((p, idx) => {
-        const el = document.getElementById(`pnum_${p.id}`);
-        if (el) el.textContent = `#${idx + 1}`;
-      });
-      document.getElementById('pdf_summary').textContent = `目前共 ${pdfPagesList.length} 頁`;
-    }
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'page-preview';
+    const thumbEl = p.canvasThumb;
+    p._thumbEl = thumbEl;
+    previewDiv.appendChild(thumbEl);
+    const hint = document.createElement('div');
+    hint.className = 'zoom-hint';
+    hint.innerHTML = `<span class="zoom-hint-label">${SVG_SEARCH}<span>Quick Look</span></span>`;
+    previewDiv.appendChild(hint);
 
-    function rotatePage(id, angle) {
-      const p = pdfPagesList.find(item => item.id === id);
-      if (!p) return;
-      p.rotation = (p.rotation + angle) % 360;
-      p.canvasThumb.style.transform = `rotate(${p.rotation}deg)`;
-    }
+    const footer = document.createElement('div');
+    footer.className = 'page-card-footer';
+    footer.innerHTML = `
+      <span class="page-num" id="pnum_${p.id}">#${idx + 1}</span>
+      <div class="page-actions">
+        <button class="icon-btn" onclick="rotatePage('${p.id}', 90)" title="旋轉 90°" type="button">${SVG_ROTATE}</button>
+        <button class="icon-btn danger" onclick="deletePage('${p.id}')" title="刪除" type="button">${SVG_TRASH}</button>
+      </div>
+    `;
+    card.appendChild(previewDiv);
+    card.appendChild(footer);
+    grid.appendChild(card);
+    previewDiv.addEventListener('mouseenter', e => showZoomTooltip(p, e.clientX));
+    previewDiv.addEventListener('mouseleave', hideZoomTooltip);
+  });
+  updatePageNumbers();
+}
 
-    function rotateAllPages(angle) {
-      pdfPagesList.forEach(p => {
-        p.rotation = (p.rotation + angle) % 360;
-        p.canvasThumb.style.transform = `rotate(${p.rotation}deg)`;
-      });
-    }
+let zoomToken = 0;
+async function showZoomTooltip(p, mx) {
+  const token = ++zoomToken;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const maxCssW = Math.min(window.innerWidth * 0.46, 820);
+  const maxCssH = window.innerHeight * 0.85 - 52;
+  const page = await p.pdfDoc.getPage(p.pageIndex + 1);
+  if (token !== zoomToken) return;
+  const rot = ((page.rotate || 0) + p.rotation) % 360;
+  const base = page.getViewport({ scale: 1, rotation: rot });
+  const fit = Math.min(maxCssW / base.width, maxCssH / base.height);
+  const key = `${p.id}|${rot}|${Math.round(fit * dpr * 100)}`;
+  let hq = hqThumbCache.get(key);
+  if (!hq) {
+    const viewport = page.getViewport({ scale: fit * dpr, rotation: rot });
+    hq = document.createElement('canvas');
+    hq.width = Math.floor(viewport.width); hq.height = Math.floor(viewport.height);
+    const ctx = hq.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, hq.width, hq.height);
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    hqThumbCache.set(key, hq);
+    if (hqThumbCache.size > 10) hqThumbCache.delete(hqThumbCache.keys().next().value);
+  }
+  if (token !== zoomToken) return;
+  zoomCanvas.width = hq.width;
+  zoomCanvas.height = hq.height;
+  zoomCanvas.style.width = Math.round(hq.width / dpr) + 'px';
+  zoomCanvas.style.height = Math.round(hq.height / dpr) + 'px';
+  zoomCanvas.getContext('2d').drawImage(hq, 0, 0);
+  zoomLabel.textContent = `第 ${p.pageNum} 頁 · ${p.sourceFileName}`;
+  zoomTooltip.classList.add('visible');
+  const TW = zoomTooltip.offsetWidth, TH = zoomTooltip.offsetHeight, GAP = 20;
+  zoomTooltip.style.left = ((mx > window.innerWidth / 2) ? GAP : window.innerWidth - TW - GAP) + 'px';
+  zoomTooltip.style.top = Math.max(GAP, (window.innerHeight - TH) / 2) + 'px';
+}
+function hideZoomTooltip() { zoomToken++; zoomTooltip.classList.remove('visible'); }
 
-    function deletePage(id) {
-      pdfPagesList = pdfPagesList.filter(p => p.id !== id);
-      const card = document.getElementById(id);
-      if (card) card.remove();
-      updatePageNumbers();
-
-      if (pdfPagesList.length === 0) {
-        document.getElementById('pdf_ctrl_bar').style.display = 'none';
+function updatePageNumbers() {
+  pdfPagesList.forEach((p, idx) => {
+    const el = document.getElementById(`pnum_${p.id}`);
+    if (el) el.textContent = `#${idx + 1}`;
+  });
+  document.getElementById('pdf_summary').textContent = `目前共 ${pdfPagesList.length} 頁`;
+}
+async function applyRotation(p) {
+  const page = await p.pdfDoc.getPage(p.pageIndex + 1);
+  const c = await renderThumb(page, p.rotation);
+  if (p._thumbEl && p._thumbEl.parentNode) p._thumbEl.replaceWith(c);
+  p._thumbEl = c; p.canvasThumb = c;
+}
+async function rotatePage(id, angle) {
+  const p = pdfPagesList.find(item => item.id === id);
+  if (!p) return;
+  p.rotation = (p.rotation + angle) % 360;
+  await applyRotation(p);
+}
+async function rotateAllPages(angle) {
+  for (const p of pdfPagesList) {
+    p.rotation = (p.rotation + angle) % 360;
+    await applyRotation(p);
+  }
+  showToast('已將全部頁面旋轉 90°');
+}
+function deletePage(id) {
+  pdfPagesList = pdfPagesList.filter(p => p.id !== id);
+  for (const k of [...hqThumbCache.keys()]) if (k.startsWith(id + '|')) hqThumbCache.delete(k);
+  const card = document.getElementById(id);
+  if (card) card.remove();
+  updatePageNumbers();
+  if (!pdfPagesList.length) document.getElementById('pdf_ctrl_bar').style.display = 'none';
+}
+function resetPdfStudio() {
+  if (!pdfPagesList.length) return;
+  pdfPagesList = [];
+  hqThumbCache.clear();
+  document.getElementById('pdf_pages_grid').innerHTML = '';
+  document.getElementById('pdf_ctrl_bar').style.display = 'none';
+  hideZoomTooltip();
+  showToast('已重置 PDF 編排工作台');
+}
+async function exportEditedPdf() {
+  if (!pdfPagesList.length) return showToast('目前沒有任何頁面可匯出');
+  const btn = document.getElementById('btn_export_pdf');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span><span>匯出中...</span>';
+  try {
+    const outPdf = await PDFLib.PDFDocument.create();
+    const docCache = new Map();
+    for (let p of pdfPagesList) {
+      let srcDoc = docCache.get(p.srcPdfBytes);
+      if (!srcDoc) {
+        srcDoc = await PDFLib.PDFDocument.load(p.srcPdfBytes);
+        docCache.set(p.srcPdfBytes, srcDoc);
       }
-    }
-
-    function resetPdfStudio() {
-      pdfPagesList = [];
-      document.getElementById('pdf_pages_grid').innerHTML = '';
-      document.getElementById('pdf_ctrl_bar').style.display = 'none';
-    }
-
-    async function exportEditedPdf() {
-      if (pdfPagesList.length === 0) return alert('目前沒有任何頁面可匯出！');
-
-      const btn = document.getElementById('btn_export_pdf');
-      btn.disabled = true;
-      btn.textContent = '匯出編排中...';
-
-      try {
-        const outPdf = await PDFLib.PDFDocument.create();
-
-        // 快取以載入的 srcPdfBytes
-        const docCache = new Map();
-
-        for (let p of pdfPagesList) {
-          let srcDoc = docCache.get(p.srcPdfBytes);
-          if (!srcDoc) {
-            srcDoc = await PDFLib.PDFDocument.load(p.srcPdfBytes);
-            docCache.set(p.srcPdfBytes, srcDoc);
-          }
-
-          const [copiedPage] = await outPdf.copyPages(srcDoc, [p.pageIndex]);
-          if (p.rotation !== 0) {
-            const currentRot = copiedPage.getRotation().angle;
-            copiedPage.setRotation(PDFLib.degrees((currentRot + p.rotation) % 360));
-          }
-          outPdf.addPage(copiedPage);
-        }
-
-        const outBytes = await outPdf.save();
-        const blob = new Blob([outBytes], { type: 'application/pdf' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `Reordered_Document_${new Date().toISOString().slice(0,10)}.pdf`;
-        a.click();
-      } catch (err) {
-        console.error('PDF 匯出失敗:', err);
-        alert('匯出失敗: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '💾 匯出新編排 PDF';
+      const [copiedPage] = await outPdf.copyPages(srcDoc, [p.pageIndex]);
+      if (p.rotation !== 0) {
+        const cur = copiedPage.getRotation().angle;
+        copiedPage.setRotation(PDFLib.degrees((cur + p.rotation) % 360));
       }
+      outPdf.addPage(copiedPage);
+    }
+    const outBytes = await outPdf.save();
+    const blob = new Blob([outBytes], { type: 'application/pdf' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Reordered_${new Date().toISOString().slice(0, 10)}.pdf`;
+    a.click();
+    recordStats(1, 0);
+    triggerAmbientPulse();
+    showToast('PDF 匯出成功', true);
+  } catch (err) {
+    console.error('PDF 匯出失敗:', err);
+    showToast('匯出失敗：' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `${SVG_DOWNLOAD}<span>匯出 PDF</span>`;
+  }
+}
+
+/* ---------- PDF COMPRESSOR ---------- */
+let targetCompressFile = null;
+const compressDropZone = document.getElementById('pdf_compress_drop_zone');
+const compressInput = document.getElementById('pdf_compress_input');
+
+['dragenter', 'dragover'].forEach(n => compressDropZone.addEventListener(n, e => { e.preventDefault(); compressDropZone.classList.add('dragover'); }));
+['dragleave', 'drop'].forEach(n => compressDropZone.addEventListener(n, e => { e.preventDefault(); compressDropZone.classList.remove('dragover'); }));
+compressDropZone.addEventListener('drop', e => { if (e.dataTransfer.files.length) loadCompressPdf(e.dataTransfer.files[0]); });
+compressInput.addEventListener('change', e => { if (e.target.files.length) loadCompressPdf(e.target.files[0]); compressInput.value = ''; });
+
+function loadCompressPdf(file) {
+  targetCompressFile = file;
+  document.getElementById('pdf_compress_ctrl').style.display = 'flex';
+  document.getElementById('compress_info').textContent = `${file.name} · 原始大小 ${formatSize(file.size)}`;
+  document.getElementById('compress_result_card').style.display = 'none';
+  document.getElementById('compress_progress_box').style.display = 'none';
+  triggerAmbientPulse();
+  showToast(`已載入 ${file.name}`);
+}
+
+async function startPdfCompression() {
+  if (!targetCompressFile) return;
+  const profile = document.getElementById('pdf_compress_profile').value;
+  let dpiScale = 0.9, imgQuality = 0.60;
+  if (profile === 'balanced') { dpiScale = 1.25; imgQuality = 0.78; }
+  else if (profile === 'print') { dpiScale = 1.6; imgQuality = 0.88; }
+
+  const progressBox = document.getElementById('compress_progress_box');
+  const progressBar = document.getElementById('compress_progress_bar');
+  const percentText = document.getElementById('compress_percent_text');
+  const statusText = document.getElementById('compress_status_text');
+  const startBtn = document.getElementById('btn_start_pdf_compress');
+
+  progressBox.style.display = 'flex';
+  startBtn.disabled = true;
+  document.getElementById('compress_result_card').style.display = 'none';
+
+  try {
+    const arrayBuf = await targetCompressFile.arrayBuffer();
+    const pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuf) }).promise;
+    const totalPages = pdfDoc.numPages;
+    const outPdf = await PDFLib.PDFDocument.create();
+
+    for (let i = 1; i <= totalPages; i++) {
+      const pct = Math.round((i / totalPages) * 100);
+      progressBar.style.width = pct + '%';
+      percentText.textContent = pct + '%';
+      statusText.textContent = `重新渲染壓縮第 ${i} / ${totalPages} 頁...`;
+      const page = await pdfDoc.getPage(i);
+      const viewport = page.getViewport({ scale: dpiScale });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width; canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      const jpegBytes = dataUrlToUint8Array(canvas.toDataURL('image/jpeg', imgQuality));
+      const embeddedImg = await outPdf.embedJpg(jpegBytes);
+      const origViewport = page.getViewport({ scale: 1.0 });
+      const newPage = outPdf.addPage([origViewport.width, origViewport.height]);
+      newPage.drawImage(embeddedImg, { x: 0, y: 0, width: origViewport.width, height: origViewport.height });
     }
 
+    statusText.textContent = '封裝 PDF 中...';
+    const compressedBytes = await outPdf.save();
+    const compressedBlob = new Blob([compressedBytes], { type: 'application/pdf' });
+    const origSize = targetCompressFile.size;
+    const newSize = compressedBlob.size;
+    const ratio = Math.max(0, Math.round(((origSize - newSize) / origSize) * 100));
 
-    // =========================================================
-    // 模組三：PDF 檔案體積壓縮 (PDF Compressor)
-    // =========================================================
-    let targetCompressFile = null;
+    document.getElementById('compress_result_card').style.display = 'flex';
+    document.getElementById('compress_stat_summary').innerHTML =
+      `<span>原始 <strong>${formatSize(origSize)}</strong> → 壓縮後 <strong>${formatSize(newSize)}</strong></span>` +
+      `<span class="tag tag-success">節省 ${ratio}%</span>`;
 
-    const compressDropZone = document.getElementById('pdf_compress_drop_zone');
-    const compressInput = document.getElementById('pdf_compress_input');
-
-    ['dragenter', 'dragover'].forEach(name => {
-      compressDropZone.addEventListener(name, (e) => { e.preventDefault(); compressDropZone.classList.add('dragover'); });
+    // Animate SVG Savings Ring
+    const circumference = 163.36;
+    const ringFg = document.getElementById('savings_ring_fg');
+    document.getElementById('savings_ring_text').textContent = `${ratio}%`;
+    ringFg.style.strokeDashoffset = circumference;
+    requestAnimationFrame(() => {
+      ringFg.style.strokeDashoffset = circumference * (1 - ratio / 100);
     });
-    ['dragleave', 'drop'].forEach(name => {
-      compressDropZone.addEventListener(name, (e) => { e.preventDefault(); compressDropZone.classList.remove('dragover'); });
-    });
-    compressDropZone.addEventListener('drop', (e) => {
-      if (e.dataTransfer.files.length > 0) loadCompressPdf(e.dataTransfer.files[0]);
-    });
-    compressInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) loadCompressPdf(e.target.files[0]);
-      compressInput.value = '';
-    });
 
-    function loadCompressPdf(file) {
-      targetCompressFile = file;
-      document.getElementById('pdf_compress_ctrl').style.display = 'flex';
-      document.getElementById('compress_info').textContent = `檔案: ${file.name} ｜ 原始大小: ${formatSize(file.size)}`;
-      document.getElementById('compress_result_card').style.display = 'none';
-      document.getElementById('compress_progress_box').style.display = 'none';
-    }
+    const dlBtn = document.getElementById('btn_download_compressed_pdf');
+    dlBtn.href = URL.createObjectURL(compressedBlob);
+    dlBtn.download = `Compressed_${targetCompressFile.name}`;
 
-    async function startPdfCompression() {
-      if (!targetCompressFile) return;
+    recordStats(1, Math.max(0, origSize - newSize));
+    triggerAmbientPulse();
+    showToast(`PDF 瘦身完成，節省 ${ratio}%`, true);
+  } catch (err) {
+    console.error('壓縮失敗:', err);
+    showToast('壓縮失敗：' + err.message);
+  } finally {
+    startBtn.disabled = false;
+    progressBox.style.display = 'none';
+  }
+}
 
-      const profile = document.getElementById('pdf_compress_profile').value;
-      let dpiScale = 1.0;
-      let imgQuality = 0.65;
-
-      if (profile === 'web') { dpiScale = 0.9; imgQuality = 0.60; }
-      else if (profile === 'balanced') { dpiScale = 1.25; imgQuality = 0.78; }
-      else if (profile === 'print') { dpiScale = 1.6; imgQuality = 0.88; }
-
-      const progressBox = document.getElementById('compress_progress_box');
-      const progressBar = document.getElementById('compress_progress_bar');
-      const percentText = document.getElementById('compress_percent_text');
-      const statusText = document.getElementById('compress_status_text');
-      const startBtn = document.getElementById('btn_start_pdf_compress');
-
-      progressBox.style.display = 'flex';
-      startBtn.disabled = true;
-
-      try {
-        const arrayBuf = await targetCompressFile.arrayBuffer();
-        const pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuf) }).promise;
-        const totalPages = pdfDoc.numPages;
-
-        const outPdf = await PDFLib.PDFDocument.create();
-
-        for (let i = 1; i <= totalPages; i++) {
-          const pct = Math.round((i / totalPages) * 100);
-          progressBar.style.width = pct + '%';
-          percentText.textContent = pct + '%';
-          statusText.textContent = `正在重新渲染並壓縮第 ${i} / ${totalPages} 頁...`;
-
-          const page = await pdfDoc.getPage(i);
-          const viewport = page.getViewport({ scale: dpiScale });
-
-          const canvas = document.createElement('canvas');
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-
-          // 導出高壓縮 JPEG
-          const jpegDataUrl = canvas.toDataURL('image/jpeg', imgQuality);
-          const jpegBytes = dataUrlToUint8Array(jpegDataUrl);
-
-          const embeddedImg = await outPdf.embedJpg(jpegBytes);
-          const origViewport = page.getViewport({ scale: 1.0 });
-
-          // 建立與原頁面相同點數長寬的 PDF 頁
-          const newPage = outPdf.addPage([origViewport.width, origViewport.height]);
-          newPage.drawImage(embeddedImg, {
-            x: 0,
-            y: 0,
-            width: origViewport.width,
-            height: origViewport.height
-          });
-        }
-
-        statusText.textContent = '封裝已瘦身 PDF 檔案中...';
-        const compressedBytes = await outPdf.save();
-        const compressedBlob = new Blob([compressedBytes], { type: 'application/pdf' });
-
-        const origSize = targetCompressFile.size;
-        const newSize = compressedBlob.size;
-        const ratio = Math.round(((origSize - newSize) / origSize) * 100);
-
-        document.getElementById('compress_result_card').style.display = 'flex';
-        document.getElementById('compress_stat_summary').innerHTML = `
-          原始大小: <strong>${formatSize(origSize)}</strong> ➔ 瘦身後: <strong>${formatSize(newSize)}</strong> 
-          <span class="tag tag-success" style="margin-left:8px;">節省 ${ratio > 0 ? ratio : 0}%</span>
-        `;
-
-        const downloadBtn = document.getElementById('btn_download_compressed_pdf');
-        downloadBtn.href = URL.createObjectURL(compressedBlob);
-        downloadBtn.download = `Compressed_${targetCompressFile.name}`;
-
-      } catch (err) {
-        console.error('PDF 壓縮失敗:', err);
-        alert('壓縮失敗: ' + err.message);
-      } finally {
-        startBtn.disabled = false;
-        progressBox.style.display = 'none';
-      }
-    }
-
-
-    // =========================================================
-    // 工具函式
-    // =========================================================
-    function formatSize(bytes) {
-      if (!bytes || bytes === 0) return '0 B';
-      const k = 1024;
-      const sizes = ['B', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-    function escapeHtml(str) {
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    function dataUrlToUint8Array(dataUrl) {
-      const base64 = dataUrl.split(',')[1];
-      const binary = atob(base64);
-      const len = binary.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-      return bytes;
-    }
-  </script>
+/* ---------- UTILITIES ---------- */
+function formatSize(bytes) {
+  if (!bytes) return '0 B';
+  const k = 1024, sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+}
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function dataUrlToUint8Array(dataUrl) {
+  const base64 = dataUrl.split(',')[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+</script>
 </body>
 </html>
