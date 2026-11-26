@@ -44,14 +44,64 @@
   --sh-pill:0 3px 12px rgba(0,0,0,.09),0 1px 2px rgba(0,0,0,.05);
   --track:rgba(0,0,0,.12);--chk1:#e8e8ed;--chk2:#f5f5f7;
 }
+[data-theme="sunlit"]{
+  --bg:#fbf5ec;--glass:rgba(255,250,242,.74);--glass-strong:rgba(255,251,245,.96);--glass-hover:rgba(255,252,247,.92);
+  --glass-header:rgba(251,245,236,.8);--glass-input:rgba(255,252,247,.88);--seg:rgba(120,65,15,.06);--seg-pill:#fffbf5;
+  --b1:rgba(140,75,20,.09);--b2:rgba(140,75,20,.14);--b-hover:rgba(217,119,6,.32);
+  --spec-top:rgba(255,255,255,.96);--spec-bot:rgba(180,100,20,.05);--spot:rgba(245,158,11,.08);--rim:rgba(234,88,12,.45);
+  --t1:#261a10;--t2:#5c4433;--t3:#94745c;
+  --accent:#d97706;--accent-btn:#ea580c;--accent-soft:rgba(234,88,12,.12);--accent-glow:rgba(234,88,12,.26);
+  --green:#1e873a;--green-soft:rgba(36,138,61,.11);--orange:#c2410c;--orange-soft:rgba(234,88,12,.14);--red:#d70015;--red-soft:rgba(215,0,21,.1);
+  --hero-grad:linear-gradient(110deg,#261a10 0%,#7c4a21 40%,#ea580c 52%,#261a10 66%,#5c4433 100%);
+  --sh-card:0 18px 46px rgba(130,70,15,.08),0 2px 12px rgba(130,70,15,.04);
+  --sh-float:0 28px 72px rgba(90,45,10,.18),0 0 0 1px rgba(140,75,20,.09);
+  --sh-pill:0 3px 12px rgba(130,70,15,.1),0 1px 2px rgba(130,70,15,.05);
+  --track:rgba(140,75,20,.13);--chk1:#f2e7d8;--chk2:#fbf5ec;
+}
+[data-theme="pride"]{
+  --bg:#faf7ff;--glass:rgba(255,255,255,.72);--glass-strong:rgba(255,252,255,.96);--glass-hover:rgba(255,255,255,.92);
+  --glass-header:rgba(250,247,255,.78);--glass-input:rgba(255,255,255,.88);--seg:rgba(120,60,180,.06);--seg-pill:#ffffff;
+  --b1:rgba(130,70,200,.1);--b2:rgba(130,70,200,.16);--b-hover:rgba(236,72,153,.38);
+  --spec-top:rgba(255,255,255,.98);--spec-bot:rgba(140,80,220,.05);--spot:rgba(236,72,153,.075);--rim:rgba(236,72,153,.48);
+  --t1:#1f162e;--t2:#52436b;--t3:#8a7aa3;
+  --accent:#db2777;--accent-btn:#be185d;--accent-soft:rgba(219,39,119,.12);--accent-glow:rgba(219,39,119,.24);
+  --green:#1e873a;--green-soft:rgba(36,138,61,.11);--orange:#d97706;--orange-soft:rgba(217,119,6,.12);--red:#d70015;--red-soft:rgba(215,0,21,.1);
+  --hero-grad:linear-gradient(110deg,#e11d48 0%,#f59e0b 25%,#10b981 50%,#3b82f6 75%,#9333ea 100%);
+  --sh-card:0 18px 48px rgba(110,50,180,.085),0 2px 12px rgba(110,50,180,.04);
+  --sh-float:0 28px 72px rgba(80,35,140,.18),0 0 0 1px rgba(130,70,200,.1);
+  --sh-pill:0 3px 12px rgba(110,50,180,.1),0 1px 2px rgba(110,50,180,.05);
+  --track:rgba(130,70,200,.13);--chk1:#efe8fa;--chk2:#faf7ff;
+}
+.pride-egg-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:999px;border:1px solid var(--b2);background:var(--seg);font-size:12px;line-height:1;cursor:pointer;vertical-align:middle;transition:transform .28s var(--spring),box-shadow .28s,border-color .22s}
+.pride-egg-btn:hover{transform:scale(1.18) rotate(8deg);border-color:rgba(255,92,168,.6);box-shadow:0 0 14px rgba(255,92,168,.45)}
+.pride-egg-btn.active{background:linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#c77dff);border-color:rgba(255,255,255,.5);box-shadow:0 0 16px rgba(255,92,168,.6)}
+.stonewall-card{display:none;position:relative;margin-top:20px;border-radius:var(--r-lg);border:1px solid rgba(219,39,119,.22);background:rgba(255,255,255,.78);backdrop-filter:saturate(180%) blur(28px);-webkit-backdrop-filter:saturate(180%) blur(28px);box-shadow:0 20px 52px rgba(120,50,150,.08),inset 0 1px 0 rgba(255,255,255,.95);overflow:hidden;contain:layout style;animation:panelIn .38s var(--ease) both}
+.stonewall-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,rgba(225,29,72,.55),rgba(245,158,11,.55),rgba(16,185,129,.55),rgba(59,130,246,.55),rgba(147,51,234,.55))}
+[data-theme="pride"] .stonewall-card{display:block}
+.stonewall-card summary{list-style:none;padding:22px 26px;display:flex;align-items:center;gap:18px;cursor:pointer;user-select:none;transition:background-color .22s}
+.stonewall-card summary::-webkit-details-marker{display:none}
+.stonewall-card summary:hover{background:rgba(255,255,255,.42)}
+.stonewall-card summary::after{content:'+';font-family:var(--font-mono);font-size:18px;font-weight:400;color:var(--t3);margin-left:auto;transition:transform .24s var(--ease),color .2s;flex-shrink:0}
+.stonewall-card[open] summary::after{transform:rotate(45deg);color:var(--accent)}
+.stonewall-year{font-family:Georgia,"Times New Roman",serif;font-size:26px;font-style:italic;font-weight:700;letter-spacing:-.02em;background:linear-gradient(120deg,#be185d,#d97706,#059669,#2563eb,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex-shrink:0;padding-right:16px;border-right:1px solid rgba(130,70,200,.16)}
+.stonewall-body h4{font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.015em;color:var(--t1)}
+.stonewall-body p{font-size:12.5px;color:var(--t2);line-height:1.62}
+.stonewall-detail{position:relative;padding:26px 32px 28px;border-top:1px solid rgba(130,70,200,.12);background:linear-gradient(180deg,rgba(255,255,255,.45),rgba(250,245,255,.65));overflow:hidden}
+.stonewall-floral{position:absolute;top:50%;width:150px;height:150px;transform:translateY(-50%);pointer-events:none;opacity:.14;color:#9d174d}
+.stonewall-floral.left{left:-24px}
+.stonewall-floral.right{right:-24px;transform:translateY(-50%) scaleX(-1)}
+.stonewall-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.stonewall-box{padding-left:16px;border-left:1.5px solid rgba(190,24,93,.22);font-size:12.5px;line-height:1.68;color:var(--t2)}
+.stonewall-box strong{display:block;color:var(--t1);font-size:13px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px}
+@media(max-width:768px){.stonewall-grid{grid-template-columns:1fr;gap:16px}.stonewall-year{font-size:21px;padding-right:12px}.stonewall-floral{width:110px;height:110px;opacity:.1}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 html{scroll-behavior:smooth;color-scheme:dark}
-html[data-theme="light"]{color-scheme:light}
+html[data-theme="light"],html[data-theme="sunlit"],html[data-theme="pride"]{color-scheme:light}
 body{font-family:var(--font-sans);background:var(--bg);color:var(--t1);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;transition:background-color .45s var(--ease),color .35s var(--ease);position:relative}
 
 /* AMBIENT & GLASS */
 #ambient_canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.92;transition:opacity .5s var(--ease)}
-[data-theme="light"] #ambient_canvas{opacity:.65}
+[data-theme="light"] #ambient_canvas,[data-theme="sunlit"] #ambient_canvas,[data-theme="pride"] #ambient_canvas{opacity:.78}
 header,.hero-section,.bento-strip,.tabs-wrap,main,footer{position:relative;z-index:2}
 
 .liquid-glass{position:relative;--mx:50%;--my:50%;background:var(--glass);backdrop-filter:saturate(180%) blur(28px);-webkit-backdrop-filter:saturate(180%) blur(28px);border:1px solid var(--b1);box-shadow:var(--sh-card),inset 0 1px 0 var(--spec-top),inset 0 -1px 0 var(--spec-bot)}
@@ -431,12 +481,17 @@ header{padding-top:env(safe-area-inset-top)}
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.31.1-2.73 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 6.84c.85 0 1.71.12 2.51.35 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.72 1.03 1.64 1.03 2.76 0 3.95-2.34 4.82-4.57 5.07.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.82 0 .27.18.59.69.49A10.26 10.26 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"/></svg>
         <span>GitHub</span>
       </a>
-      <button class="nav-pill-btn" onclick="showBookmarkTip()" type="button">
+      <button class="nav-pill-btn bookmark-btn" onclick="showBookmarkTip()" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
         <span>加入書籤</span>
       </button>
-      <button class="theme-btn" id="theme_toggle_btn" onclick="toggleTheme()" type="button" title="切換深色 / 淺色外觀" aria-label="切換外觀">
+      <button class="nav-pill-btn" id="lang_toggle_btn" onclick="toggleLang()" type="button" title="EN / ES / 繁中">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="lang_btn_label">繁中</span>
+      </button>
+      <button class="theme-btn" id="theme_toggle_btn" onclick="toggleTheme()" type="button" title="切換深色 / 淺色 / 陽光暖橘外觀" aria-label="切換外觀">
         <svg id="theme_icon_sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg id="theme_icon_sunlit" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10V2M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M16 18a4 4 0 0 0-8 0"/></svg>
         <svg id="theme_icon_moon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
     </div>
@@ -478,7 +533,7 @@ header{padding-top:env(safe-area-inset-top)}
       <div class="rim-glow"></div>
       <div class="drop-zone-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
       <div class="drop-zone-title">拖曳圖片至此，或點擊選取</div>
-      <div class="drop-zone-desc">支援批次拖曳與 <strong>Ctrl + V</strong> 剪貼簿直接貼上；轉檔完成後可點擊「對比」開啟前後滑動檢視</div>
+      <div class="drop-zone-desc" data-i18n-html="img_drop_desc">支援批次拖曳與 <strong>Ctrl + V</strong> 剪貼簿直接貼上；轉檔完成後可點擊「對比」開啟前後滑動檢視</div>
       <div class="format-pills"><span class="format-pill featured">HEIC / HEIF</span><span class="format-pill">PNG</span><span class="format-pill">JPG / JPEG</span><span class="format-pill">WEBP</span><span class="format-pill">BMP</span></div>
       <input type="file" id="img_file_input" class="file-input" multiple accept=".heic,.heif,.png,.jpg,.jpeg,.webp,.bmp">
     </div>
@@ -570,7 +625,7 @@ header{padding-top:env(safe-area-inset-top)}
       <div class="rim-glow"></div>
       <div class="drop-zone-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
       <div class="drop-zone-title">拖曳 PDF 至此，或點擊選取</div>
-      <div class="drop-zone-desc">自動高解析渲染每頁縮圖，支援 <strong>拖曳排序、多檔合併、刪頁、旋轉</strong>；懸停縮圖即隨視角放大預覽</div>
+      <div class="drop-zone-desc" data-i18n-html="pdf_drop_desc">自動高解析渲染每頁縮圖，支援 <strong>拖曳排序、多檔合併、刪頁、旋轉</strong>；懸停縮圖即隨視角放大預覽</div>
       <div class="format-pills"><span class="format-pill featured">多份 PDF 合併</span><span class="format-pill">拖曳排序</span><span class="format-pill">跟隨視角放大預覽</span><span class="format-pill">90° 旋轉</span></div>
       <input type="file" id="pdf_file_input" class="file-input" accept=".pdf" multiple>
     </div>
@@ -634,7 +689,7 @@ header{padding-top:env(safe-area-inset-top)}
       <div class="rim-glow"></div>
       <div class="drop-zone-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg></div>
       <div class="drop-zone-title">拖曳要瘦身的 PDF 至此</div>
-      <div class="drop-zone-desc">智慧重新採樣頁面影像並重新封裝，特別適合 <strong>手機掃描檔、簡報與高畫質大圖報表</strong></div>
+      <div class="drop-zone-desc" data-i18n-html="cmp_drop_desc">智慧重新採樣頁面影像並重新封裝，特別適合 <strong>手機掃描檔、簡報與高畫質大圖報表</strong></div>
       <div class="format-pills"><span class="format-pill featured">輕量網路版 72 DPI</span><span class="format-pill">螢幕閱讀版 120 DPI</span><span class="format-pill">高解析版 150 DPI</span></div>
       <input type="file" id="pdf_compress_input" class="file-input" accept=".pdf">
     </div>
@@ -716,21 +771,48 @@ header{padding-top:env(safe-area-inset-top)}
     <div class="faq-list">
       <details class="faq-item liquid-glass">
         <summary>什麼是「100% 本機運算」？我要怎麼親眼驗證真的沒有上傳檔案？</summary>
-        <div class="faq-ans">所有影像編解碼與 PDF 重組都是透過瀏覽器內建的 Canvas 硬體加速與 WebAssembly 在你的裝置裡直接執行。你可以親自做<strong>「飛航模式測試」</strong>：打開本網頁後直接關掉 Wi-Fi 或開啟飛航模式，再拖曳圖片或 PDF 轉檔，依然 100% 正常運作；進階用戶也能按 <code>F12 → Network</code> 確認全程零檔案上傳請求。</div>
+        <div class="faq-ans" data-i18n-html="faq_a1">所有影像編解碼與 PDF 重組都是透過瀏覽器內建的 Canvas 硬體加速與 WebAssembly 在你的裝置裡直接執行。你可以親自做<strong>「飛航模式測試」</strong>：打開本網頁後直接關掉 Wi-Fi 或開啟飛航模式，再拖曳圖片或 PDF 轉檔，依然 100% 正常運作；進階用戶也能按 <code>F12 → Network</code> 確認全程零檔案上傳請求。</div>
       </details>
       <details class="faq-item liquid-glass">
         <summary>為什麼這裡完全免費、沒有廣告，也沒有 100 MB 檔案大小限制？</summary>
-        <div class="faq-ans">傳統免費網站（如 iLovePDF）需要租用昂貴的雲端伺服器來接收與處理你的檔案，所以必須限制 100 MB、插滿廣告並推銷月費訂閱。QuC 採用純前端靜態架構，零伺服器運算成本，因此可以無條件免費開放所有功能。</div>
+        <div class="faq-ans" data-i18n-html="faq_a2">傳統免費網站（如 iLovePDF）需要租用昂貴的雲端伺服器來接收與處理你的檔案，所以必須限制 100 MB、插滿廣告並推銷月費訂閱。QuC 採用純前端靜態架構，零伺服器運算成本，因此可以無條件免費開放所有功能。</div>
       </details>
       <details class="faq-item liquid-glass">
         <summary>免安裝就能用，會不會有中毒風險？手機也可以操作嗎？</summary>
-        <div class="faq-ans">本工具完全運行於瀏覽器的安全沙盒（Sandbox）內，不需要下載任何 <code>.exe</code> 安裝檔，網頁也無法主動讀取你硬碟裡的其他檔案（只有你手動選取或拖入的檔案才會進入暫存記憶體）。iPhone（Safari）與 Android（Chrome）皆可直接開啟使用。</div>
+        <div class="faq-ans" data-i18n-html="faq_a3">本工具完全運行於瀏覽器的安全沙盒（Sandbox）內，不需要下載任何 <code>.exe</code> 安裝檔，網頁也無法主動讀取你硬碟裡的其他檔案（只有你手動選取或拖入的檔案才會進入暫存記憶體）。iPhone（Safari）與 Android（Chrome）皆可直接開啟使用。</div>
       </details>
       <details class="faq-item liquid-glass">
         <summary>處理大量高解析度照片或上千頁 PDF 會不會讓瀏覽器越來越卡？</summary>
-        <div class="faq-ans">QuC 針對長時批次作業做了深度記憶體最佳化：圖片清單僅保留 240px 輕量縮圖、轉檔重用單一畫布並立即歸零釋放；PDF 採用視窗懶載入與每區 50／100 頁分頁顯示；按下「清空」會強制釋放所有暫存 Blob URL 與畫布記憶體。</div>
+        <div class="faq-ans" data-i18n-html="faq_a4">QuC 針對長時批次作業做了深度記憶體最佳化：圖片清單僅保留 240px 輕量縮圖、轉檔重用單一畫布並立即歸零釋放；PDF 採用視窗懶載入與每區 50／100 頁分頁顯示；按下「清空」會強制釋放所有暫存 Blob URL 與畫布記憶體。</div>
       </details>
     </div>
+    <details class="stonewall-card" id="stonewall_card">
+      <summary>
+        <span class="stonewall-year">1969</span>
+        <div class="stonewall-body">
+          <h4>紀念 1969 石牆事件（Stonewall Riots）</h4>
+          <p>1969 年 6 月 28 日凌晨，紐約格林威治村的石牆酒吧爆發了改變歷史的抗爭，點燃了現代全球 LGBTQ+ 平權與驕傲月（Pride）運動的起點。點擊展開完整歷史分析。</p>
+        </div>
+      </summary>
+      <div class="stonewall-detail">
+        <svg class="stonewall-floral left" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><path d="M22 106C28 76 48 52 78 34"/><path d="M78 34C72 22 82 12 94 18C104 24 96 38 78 34Z"/><path d="M78 34C90 36 98 48 86 56C74 62 68 48 78 34Z"/><path d="M52 64C36 62 28 48 40 42C50 38 56 50 52 64Z"/><path d="M40 82C54 84 64 96 50 102C38 106 34 92 40 82Z"/></svg>
+        <svg class="stonewall-floral right" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><path d="M22 106C28 76 48 52 78 34"/><path d="M78 34C72 22 82 12 94 18C104 24 96 38 78 34Z"/><path d="M78 34C90 36 98 48 86 56C74 62 68 48 78 34Z"/><path d="M52 64C36 62 28 48 40 42C50 38 56 50 52 64Z"/><path d="M40 82C54 84 64 96 50 102C38 106 34 92 40 82Z"/></svg>
+        <div class="stonewall-grid">
+          <div class="stonewall-box">
+            <strong>為何爆發（歷史背景）</strong>
+            <span>1960 年代美國多州仍將同性戀視為違法，警方常無預警臨檢並逮捕酒吧客人。6 月 28 日凌晨的臨檢中，現場群眾首度拒絕沉默配合，連續數夜在克里斯多福街集結抗爭。</span>
+          </div>
+          <div class="stonewall-box">
+            <strong>關鍵轉折（勇敢站出的人）</strong>
+            <span>包含 Marsha P. Johnson、Sylvia Rivera 等跨性別女性與無數邊緣社群成員站在最前線，將原本分散的地下求生，轉化為公開且團結的民權運動。</span>
+          </div>
+          <div class="stonewall-box">
+            <strong>歷史影響（Pride 驕傲月）</strong>
+            <span>隔年 1970 年 6 月 28 日，紐約、洛杉磯與芝加哥舉辦了史上第一場「克里斯多福街解放日」遊行，這正是今日全球每年 6 月「驕傲月（Pride Month）」的由來。</span>
+          </div>
+        </div>
+      </div>
+    </details>
   </section>
 </main>
 
@@ -837,10 +919,12 @@ header{padding-top:env(safe-area-inset-top)}
 <div class="toast-island" id="toast_island" role="status" aria-live="polite"><span class="toast-dot"></span><span id="toast_text"></span></div>
 <div class="ui-select-popover" id="ui_select_popover" role="listbox"></div>
 
-<footer><strong>QuC Pro</strong> &nbsp;·&nbsp; 100% 本機瀏覽器運算，零資料上傳風險 &nbsp;·&nbsp; 按下 <strong>Ctrl + K</strong> 開啟快速指令 &nbsp;·&nbsp; <a class="footer-link" href="https://github.com/Cockdale169/PNG_JPG_HEIC_datatype_converter_and_PDF_adjust" target="_blank" rel="noopener noreferrer">GitHub 開源專案</a> &nbsp;·&nbsp; <button type="button" class="footer-link" onclick="openLegalModal()">隱私條款與開源授權</button></footer>
+<footer><strong>QuC Pro</strong> &nbsp;·&nbsp; <span data-i18n="footer_priv">100% 本機瀏覽器運算，零資料上傳風險</span> &nbsp;·&nbsp; <span data-i18n-html="footer_cmd">按下 <strong>Ctrl + K</strong> 開啟快速指令</span> &nbsp;·&nbsp; <a class="footer-link" href="https://github.com/Cockdale169/PNG_JPG_HEIC_datatype_converter_and_PDF_adjust" target="_blank" rel="noopener noreferrer">GitHub 開源專案</a> &nbsp;·&nbsp; <button type="button" class="footer-link" onclick="openLegalModal()">隱私條款與開源授權</button> &nbsp;·&nbsp; <button type="button" class="pride-egg-btn" id="pride_egg_btn" onclick="togglePrideEgg()" title="Pride Aurora">🏳️‍🌈</button></footer>
 
 <script>
 const $ = id => document.getElementById(id);
+let currentLang = 'zh-TW';
+const L = (en, zh, es) => currentLang === 'en' ? en : currentLang === 'es' ? (es || en) : zh;
 
 // [AMBIENT] Low-cost 30fps aurora renderer, auto-paused when hidden or reduced-motion
 (() => {
@@ -850,10 +934,12 @@ const $ = id => document.getElementById(id);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const darkP = [[[0,113,227],[94,92,230],[41,151,255]],[[165,94,245],[41,151,255],[94,92,230]],[[48,209,88],[0,175,215],[41,151,255]]];
   const lightP = [[[41,151,255],[125,118,250],[100,210,255]],[[180,120,255],[75,165,255],[135,125,255]],[[52,199,89],[64,200,224],[41,151,255]]];
+  const sunlitP = [[[255,159,10],[251,191,36],[234,88,12]],[[249,115,22],[245,158,11],[253,186,116]],[[245,158,11],[234,88,12],[251,146,60]]];
+  const prideP = [[[255,110,165],[255,210,85],[95,225,170]],[[110,175,255],[205,130,255],[255,120,185]],[[255,165,90],[90,220,210],[190,135,255]]];
   let palIdx = 0, pulse = 0, t = 0, last = 0;
   const cur = darkP[0].map(c => [...c]);
   const m = { x: .5, y: .25, tx: .5, ty: .25 };
-  const pts = Array.from({ length: 18 }, () => ({ x: Math.random(), y: Math.random(), r: .9 + Math.random() * 1.6, vx: (Math.random() - .5) * .00025, vy: -.00014 - Math.random() * .00022, p: Math.random() * 6.28 }));
+  const pts = Array.from({ length: 18 }, (_, i) => ({ x: Math.random(), y: Math.random(), r: .9 + Math.random() * 1.6, vx: (Math.random() - .5) * .00025, vy: -.00014 - Math.random() * .00022, p: Math.random() * 6.28, hue: (i * 20) % 360 }));
   window.setAmbientPalette = i => { palIdx = i; pulse = .65; };
   window.triggerAmbientPulse = () => { pulse = 1; };
   addEventListener('pointermove', e => { m.tx = e.clientX / Math.max(innerWidth, 1); m.ty = e.clientY / Math.max(innerHeight, 1); }, { passive: true });
@@ -863,8 +949,9 @@ const $ = id => document.getElementById(id);
   const draw = now => {
     if (!document.hidden && now - last >= 33) {
       last = now; t += .011; m.x += (m.tx - m.x) * .06; m.y += (m.ty - m.y) * .06; pulse *= .93;
-      const isL = document.documentElement.getAttribute('data-theme') === 'light';
-      const tp = (isL ? lightP : darkP)[palIdx] || darkP[0];
+      const curTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const isL = curTheme === 'light' || curTheme === 'sunlit' || curTheme === 'pride';
+      const tp = (curTheme === 'pride' ? prideP : curTheme === 'sunlit' ? sunlitP : curTheme === 'light' ? lightP : darkP)[palIdx] || darkP[0];
       for (let i = 0; i < 3; i++) for (let c = 0; c < 3; c++) cur[i][c] += (tp[i][c] - cur[i][c]) * .07;
       const cw = cv.width, ch = cv.height, boost = 1 + pulse * .35, maxD = Math.max(cw, ch);
       ctx.clearRect(0, 0, cw, ch);
@@ -882,8 +969,9 @@ const $ = id => document.getElementById(id);
       for (const p of pts) {
         p.x = (p.x + p.vx + 1) % 1; p.y = (p.y + p.vy + 1) % 1;
         const a = (.18 + .2 * Math.sin(t * 2 + p.p)) * (isL ? .45 : .72);
-        ctx.beginPath(); ctx.arc(p.x * cw + (m.x - .5) * 14, p.y * ch + (m.y - .5) * 10, p.r, 0, 6.283);
-        ctx.fillStyle = isL ? `rgba(0,113,227,${a})` : `rgba(210,232,255,${a})`; ctx.fill();
+        const px = p.x * cw + (m.x - .5) * 14, py = p.y * ch + (m.y - .5) * 10;
+        ctx.beginPath(); ctx.arc(px, py, curTheme === 'pride' ? p.r * 1.25 : p.r, 0, 6.283);
+        ctx.fillStyle = curTheme === 'pride' ? `hsla(${p.hue},88%,62%,${(a * 1.25).toFixed(2)})` : isL ? `rgba(0,113,227,${a})` : `rgba(210,232,255,${a})`; ctx.fill();
       }
       ctx.globalCompositeOperation = 'source-over';
     }
@@ -993,23 +1081,44 @@ function showToast(msg, ok = false) {
 function applyTheme(t, persist = true) {
   document.documentElement.setAttribute('data-theme', t);
   $('theme_icon_sun').style.display = t === 'dark' ? '' : 'none';
-  $('theme_icon_moon').style.display = t === 'light' ? '' : 'none';
+  $('theme_icon_sunlit').style.display = (t === 'light' || t === 'pride') ? '' : 'none';
+  $('theme_icon_moon').style.display = t === 'sunlit' ? '' : 'none';
+  const egg = $('pride_egg_btn');
+  if (egg) egg.classList.toggle('active', t === 'pride');
   const mt = $('meta_theme_color');
-  if (mt) mt.setAttribute('content', t === 'light' ? '#f5f5f7' : '#000000');
+  if (mt) mt.setAttribute('content', t === 'pride' ? '#faf7ff' : t === 'sunlit' ? '#fbf5ec' : t === 'light' ? '#f5f5f7' : '#000000');
   if (persist) { try { localStorage.setItem('lfs_theme', t); } catch (_) {} }
 }
+function togglePrideEgg() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  if (cur === 'pride') {
+    const hr = new Date().getHours();
+    const fallback = (hr >= 5 && hr < 12) ? 'light' : (hr >= 12 && hr < 18) ? 'sunlit' : 'dark';
+    applyTheme(fallback, true); triggerAmbientPulse();
+    showToast(L('Back to standard theme', '已切回日常時段外觀', 'Tema estándar activado'));
+  } else {
+    applyTheme('pride', true); triggerAmbientPulse();
+    showToast('🏳️‍🌈 Pride Aurora Mode!', true);
+  }
+}
 function toggleTheme() {
-  const next = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
+  const order = ['light', 'sunlit', 'dark'];
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = order[(order.indexOf(cur) + 1) % order.length];
   applyTheme(next, true); triggerAmbientPulse();
-  showToast(next === 'dark' ? '已切換至深色 Pro 外觀' : '已切換至淺色 Studio 外觀');
+  const msg = next === 'light' ? L('Morning Light Mode', '已切換至晨間淺色外觀', 'Modo Claro Matinal')
+            : next === 'sunlit' ? L('Warm Sunlit Mode', '已切換至陽光暖橘外觀', 'Modo Luz Solar Cálida')
+            : L('Night Dark Mode', '已切換至夜晚深色外觀', 'Modo Oscuro Nocturno');
+  showToast(msg);
 }
 (() => {
   let saved = '';
   try { saved = localStorage.getItem('lfs_theme') || ''; } catch (_) {}
-  if (saved === 'light' || saved === 'dark') applyTheme(saved, false);
+  if (saved === 'light' || saved === 'sunlit' || saved === 'dark' || saved === 'pride') applyTheme(saved, false);
   else {
-    const hr = new Date().getHours();
-    applyTheme(hr >= 6 && hr < 18 ? 'light' : 'dark', false);
+    const now = new Date(), mo = now.getMonth(), hr = now.getHours();
+    const auto = mo === 5 ? 'pride' : (hr >= 5 && hr < 12) ? 'light' : (hr >= 12 && hr < 18) ? 'sunlit' : 'dark';
+    applyTheme(auto, false);
   }
 })();
 
@@ -1998,6 +2107,268 @@ async function startPdfCompression() {
 function formatSize(b) { if (!b) return '0 B'; const i = Math.floor(Math.log(b) / Math.log(1024)); return (b / Math.pow(1024, i)).toFixed(2) + ' ' + ['B','KB','MB','GB'][i]; }
 function escapeHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function dataUrlToU8(u) { const bin = atob(u.split(',')[1]), out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
+
+// [I18N] 3-Language System: English ('en'), Español ('es'), Traditional Chinese ('zh-TW')
+const I18N_MAP = {
+  '100% 本機離線運算': ['100% Local Offline', '100% Local Sin Conexión'],
+  '快速指令': ['Commands', 'Comandos'],
+  '加入書籤': ['Bookmark', 'Marcador'],
+  '極速轉檔與 PDF 編排工作台': ['Instant File Converter & PDF Studio', 'Conversor de Archivos y Estudio PDF'],
+  '結合液態玻璃光學介面與本機硬體加速引擎。支援 HEIC 無損轉檔、精準體積瘦身、前後畫質對比與視覺化 PDF 編排。': [
+    'Hardware-accelerated local processing in your browser. Convert HEIC, resize & compress images, and organize 2,000+ page PDFs with zero uploads.',
+    'Procesamiento local acelerado en tu navegador. Convierte HEIC, redimensiona imágenes y organiza PDFs de más de 2,000 páginas sin subir archivos.'
+  ],
+  '本機已處理': ['Processed Locally', 'Procesados Localmente'],
+  '0 個檔案': ['0 files', '0 archivos'],
+  '累計節省空間': ['Space Saved', 'Espacio Ahorrado'],
+  '本機運算引擎': ['Local Engine', 'Motor Local'],
+  '資料隱私防護': ['Privacy Shield', 'Escudo de Privacidad'],
+  '0 Bytes 上傳 · 完全離線': ['0 Bytes Uploaded · Offline', '0 Bytes Subidos · Sin Conexión'],
+  '圖片轉檔與壓縮': ['Image Converter', 'Conversor de Imágenes'],
+  'PDF 頁面編排': ['PDF Organizer', 'Organizador PDF'],
+  'PDF 瘦身壓縮': ['PDF Compressor', 'Compresor PDF'],
+  '拖曳圖片至此，或點擊選取': ['Drop images here, or click to browse', 'Arrastra imágenes aquí o toca para elegir'],
+  '輸出格式': ['Output Format', 'Formato de Salida'],
+  '壓縮品質': ['Quality', 'Calidad'],
+  '尺寸調整': ['Resize', 'Tamaño'],
+  '自訂尺寸（像素）': ['Custom Size (px)', 'Tamaño Personalizado (px)'],
+  '檔案大小瘦身': ['Target File Size', 'Tamaño Objetivo'],
+  '每張上限 (MB)': ['Max Size (MB)', 'Límite (MB)'],
+  '開始轉檔': ['Convert All', 'Convertir Todo'],
+  '合併為 PDF': ['Merge to PDF', 'Unir en PDF'],
+  '打包下載 ZIP': ['Download ZIP', 'Descargar ZIP'],
+  '清空': ['Clear', 'Limpiar'],
+  '圖片清單': ['Image Queue', 'Lista de Imágenes'],
+  '清單': ['List', 'Lista'],
+  '網格': ['Grid', 'Cuadrícula'],
+  '緊湊': ['Compact', 'Compacto'],
+  '拖曳 PDF 至此，或點擊選取': ['Drop PDF files here, or click to browse', 'Arrastra archivos PDF aquí o toca para elegir'],
+  '多份 PDF 合併': ['Merge PDFs', 'Unir PDFs'],
+  '拖曳排序': ['Drag Reorder', 'Reordenar'],
+  '跟隨視角放大預覽': ['Smart Zoom', 'Zoom Inteligente'],
+  '90° 旋轉': ['90° Rotate', 'Rotar 90°'],
+  '支援千頁教科書秒開懶載入 · 拖曳排序 · 懸停放大': ['Lazy-loading enabled · Drag to reorder · Hover to zoom', 'Carga rápida · Arrastra para ordenar · Toca para ampliar'],
+  '插入其他 PDF': ['Insert PDF', 'Insertar PDF'],
+  '全部旋轉': ['Rotate All', 'Rotar Todo'],
+  '清空重來': ['Reset', 'Reiniciar'],
+  '匯出為圖片': ['Export Images', 'Exportar Imágenes'],
+  '匯出 PDF': ['Export PDF', 'Exportar PDF'],
+  '顯示分區': ['Chunk View', 'Vista por Bloques'],
+  '全部': ['All', 'Todo'],
+  '50 頁': ['50p', '50 pág.'],
+  '100 頁': ['100p', '100 pág.'],
+  '跳頁': ['Jump', 'Ir a'],
+  '前往': ['Go', 'Ir'],
+  '區間批次': ['Batch Range', 'Rango'],
+  '旋轉': ['Rotate', 'Rotar'],
+  '刪除': ['Delete', 'Eliminar'],
+  '僅匯出區間': ['Export Range', 'Exportar Rango'],
+  '拖曳要瘦身的 PDF 至此': ['Drop a PDF here to compress', 'Arrastra un PDF aquí para comprimir'],
+  '輕量網路版 72 DPI': ['Web 72 DPI', 'Web 72 DPI'],
+  '螢幕閱讀版 120 DPI': ['Screen 120 DPI', 'Pantalla 120 DPI'],
+  '高解析版 150 DPI': ['Print 150 DPI', 'Impresión 150 DPI'],
+  '選擇壓縮等級': ['Compression Profile', 'Nivel de Compresión'],
+  '開始壓縮': ['Compress PDF', 'Comprimir PDF'],
+  '輕量網路版': ['Web Lightweight', 'Web Ligero'],
+  '品質 65% · 極致瘦身，最適合 Email 附件與即時通訊傳送': ['65% quality · Smallest size for email & messaging', 'Calidad 65% · Tamaño mínimo para correo y WhatsApp'],
+  '螢幕閱讀版': ['Screen Reading', 'Lectura en Pantalla'],
+  '品質 80% · 畫質與體積完美平衡，適合平板與筆電閱讀': ['80% quality · Balanced clarity for tablets & laptops', 'Calidad 80% · Equilibrio ideal para móvil y laptop'],
+  '高解析版': ['High Resolution', 'Alta Resolución'],
+  '品質 88% · 保留圖表與細字細節，適合存檔與列印': ['88% quality · Preserves fine text & charts for printing', 'Calidad 88% · Conserva texto nítido para imprimir'],
+  'PDF 瘦身完成': ['Compression Complete', 'Compresión Completada'],
+  '下載瘦身 PDF': ['Download PDF', 'Descargar PDF'],
+  'GitHub 開源專案': ['GitHub Open Source', 'Código en GitHub'],
+  '隱私條款與開源授權': ['Privacy & Licenses', 'Privacidad y Licencias'],
+  '為什麼選擇 QuC？100% 本機瀏覽器運算': ['Why QuC? 100% On-Device Browser Processing', '¿Por qué QuC? 100% Procesamiento Local'],
+  '完全免費、無廣告、免註冊帳號。所有圖片轉檔與 PDF 處理都在你自己的裝置記憶體內完成，檔案永不離開你的電腦或手機。': [
+    '100% free, ad-free, no sign-up. All image conversions and PDF edits run inside your own device memory — files never leave your computer or phone.',
+    '100% gratis, sin anuncios ni registro. Todas las conversiones y ediciones de PDF ocurren en tu dispositivo: tus archivos nunca salen de tu equipo.'
+  ],
+  '零上傳隱私保護': ['Zero-Upload Privacy', 'Privacidad Cero Subidas'],
+  '不同於傳統雲端轉檔網站，QuC 沒有任何上傳伺服器。身分證件、合約、病歷、財務報表與私人照片全程留在你的裝置裡處理，徹底杜絕外流風險。': [
+    'Unlike cloud converters, QuC has no upload servers. IDs, contracts, medical records, and private photos stay strictly on your device.',
+    'A diferencia de la nube, QuC no tiene servidores de subida. Documentos, contratos y fotos privadas permanecen siempre en tu dispositivo.'
+  ],
+  '無 100 MB 限制 · 千頁秒開': ['No 100 MB Limit · 2,000+ Pages', 'Sin Límite de 100 MB'],
+  '因為不消耗雲端伺服器頻寬，沒有任何檔案大小上限或每日次數限制。內建 240px 輕量縮圖管線、PDF 懶載入與分區跳頁，千頁教科書也能順暢操作。': [
+    'Zero server bandwidth means no 100 MB caps or daily limits. Built-in 240px thumbnail pipeline and PDF lazy-loading handle 2,000-page books smoothly.',
+    'Sin costos de servidor, no hay límites de 100 MB ni topes diarios. Carga diferida y miniaturas de 240px manejan PDFs enormes con fluidez.'
+  ],
+  '桌機與手機皆順手': ['Built for Desktop & Mobile', 'Ideal para PC y Móvil'],
+  '桌機支援黃金比例側邊放大預覽與拖曳排序；手機（iOS / Android）自動切換為零干擾點按預覽與防誤觸滑動，開源核心引擎（PDF.js、pdf-lib、JSZip）透明可信。': [
+    'Desktop gets golden-ratio hover previews and drag sorting; iOS & Android switch to tap-to-preview lightboxes with zero scroll interference.',
+    'En PC ofrece vista previa lateral dorada y arrastrar; en iOS y Android cambia a vista táctil sin interferir con el desplazamiento.'
+  ],
+  '拖曳、選取或 Ctrl + V 貼上': ['Drop, Browse, or Ctrl + V', 'Arrastra, Elige o Ctrl + V'],
+  '一次丟入多張圖片（含 iPhone HEIC）或多份 PDF，立刻於本機載入。': [
+    'Load multiple images (including iPhone HEIC) or PDFs instantaneously.',
+    'Carga múltiples imágenes (incluido HEIC de iPhone) o PDFs al instante.'
+  ],
+  '即時調整與預覽': ['Adjust & Preview', 'Ajusta y Previsualiza'],
+  '指定輸出格式、目標容量（KB/MB）、前後畫質滑動對比，或拖曳旋轉重排 PDF。': [
+    'Pick format, target KB/MB, compare before/after quality, or reorder & rotate PDF pages.',
+    'Elige formato, tamaño objetivo (KB/MB), compara calidad o reordena páginas PDF.'
+  ],
+  '一鍵下載並釋放記憶體': ['Download & Clear Memory', 'Descarga y Libera Memoria'],
+  '單檔下載或打包成 ZIP；按下「清空」即主動釋放暫存畫布與記憶體。': [
+    'Save individual files or export as ZIP; click Clear to immediately release canvas memory.',
+    'Guarda archivos o exporta en ZIP; pulsa Limpiar para liberar memoria al instante.'
+  ],
+  '什麼是「100% 本機運算」？我要怎麼親眼驗證真的沒有上傳檔案？': [
+    'What is 100% on-device processing? How can I verify zero uploads?',
+    '¿Qué es el procesamiento 100% local y cómo verifico que no sube nada?'
+  ],
+  '為什麼這裡完全免費、沒有廣告，也沒有 100 MB 檔案大小限制？': [
+    'Why is QuC completely free, ad-free, and without a 100 MB limit?',
+    '¿Por qué QuC es totalmente gratis, sin anuncios ni límite de 100 MB?'
+  ],
+  '免安裝就能用，會不會有中毒風險？手機也可以操作嗎？': [
+    'Is it virus-free without installing software? Does it work on mobile?',
+    '¿Es seguro sin instalar programas? ¿Funciona en teléfonos móviles?'
+  ],
+  '處理大量高解析度照片或上千頁 PDF 會不會讓瀏覽器越來越卡？': [
+    'Will processing many photos or large PDFs slow down my browser?',
+    '¿Procesar muchas fotos o PDFs grandes hará lento mi navegador?'
+  ],
+  '加入瀏覽器書籤': ['Bookmark This Tool', 'Guardar en Marcadores'],
+  '知道了': ['Got it', 'Entendido'],
+  '關閉': ['Close', 'Cerrar'],
+  '前後畫質對比': ['Before / After Compare', 'Comparar Antes / Después'],
+  '原圖': ['Original', 'Original'],
+  '轉檔後': ['Converted', 'Convertida'],
+  '隱私聲明、免責條款與開源授權': ['Privacy, Terms & Open Source Licenses', 'Privacidad, Términos y Licencias'],
+  '了解並關閉': ['Close', 'Cerrar'],
+  '紀念 1969 石牆事件（Stonewall Riots）': ['In Honor of the 1969 Stonewall Riots', 'En Memoria de Stonewall (1969)'],
+  '1969 年 6 月 28 日凌晨，紐約格林威治村的石牆酒吧爆發了改變歷史的抗爭，點燃了現代全球 LGBTQ+ 平權與驕傲月（Pride）運動的起點。點擊展開完整歷史分析。': [
+    'On June 28, 1969, at the Stonewall Inn in New York City, a historic uprising sparked the modern global LGBTQ+ rights and Pride movement. Click to read the full historical analysis.',
+    'El 28 de junio de 1969, en el Stonewall Inn de Nueva York, un levantamiento histórico dio origen al movimiento moderno por los derechos LGBTQ+ y el Orgullo. Toca para ver el análisis.'
+  ],
+  '為何爆發（歷史背景）': ['Why It Happened (Context)', 'Por Qué Ocurrió (Contexto)'],
+  '1960 年代美國多州仍將同性戀視為違法，警方常無預警臨檢並逮捕酒吧客人。6 月 28 日凌晨的臨檢中，現場群眾首度拒絕沉默配合，連續數夜在克里斯多福街集結抗爭。': [
+    'In the 1960s, police routinely raided gay bars and arrested patrons. During the June 28 raid, the crowd refused to stay silent, sparking days of resistance along Christopher Street.',
+    'En los años 60, la policía allanaba bares con frecuencia. El 28 de junio la comunidad se negó a callar, iniciando días de resistencia en Christopher Street.'
+  ],
+  '關鍵轉折（勇敢站出的人）': ['Turning Point (Pioneers)', 'Punto de Inflexión (Pioneras)'],
+  '包含 Marsha P. Johnson、Sylvia Rivera 等跨性別女性與無數邊緣社群成員站在最前線，將原本分散的地下求生，轉化為公開且團結的民權運動。': [
+    'Transgender women of color like Marsha P. Johnson and Sylvia Rivera, alongside marginalized youth, stood on the front lines — turning quiet survival into an organized civil rights movement.',
+    'Mujeres trans como Marsha P. Johnson y Sylvia Rivera lideraron la primera línea, transformando la supervivencia en un movimiento unido por los derechos civiles.'
+  ],
+  '歷史影響（Pride 驕傲月）': ['Legacy (Pride Month)', 'Legado (Mes del Orgullo)'],
+  '隔年 1970 年 6 月 28 日，紐約、洛杉磯與芝加哥舉辦了史上第一場「克里斯多福街解放日」遊行，這正是今日全球每年 6 月「驕傲月（Pride Month）」的由來。': [
+    'One year later on June 28, 1970, the first Christopher Street Liberation Day marches took place in NYC, LA, and Chicago — giving birth to modern Pride Month every June.',
+    'Un año después, el 28 de junio de 1970, nacieron las primeras marchas del Orgullo en Nueva York, Los Ángeles y Chicago, dando origen al Mes del Orgullo.'
+  ]
+};
+const OPT_MAP = {
+  'PNG（無損透明）': ['PNG (Lossless)', 'PNG (Sin pérdida)'],
+  'WEBP（極致壓縮）': ['WEBP (Compact)', 'WEBP (Compacto)'],
+  '保持原始解析度': ['Original Resolution', 'Resolución Original'],
+  '2K QHD（最大寬 2560px）': ['2K QHD (Max 2560px)', '2K QHD (Máx. 2560px)'],
+  'Full HD（最大寬 1920px）': ['Full HD (Max 1920px)', 'Full HD (Máx. 1920px)'],
+  'HD（最大寬 1280px）': ['HD (Max 1280px)', 'HD (Máx. 1280px)'],
+  '網頁縮圖（最大寬 800px）': ['Web Thumb (Max 800px)', 'Miniatura Web (Máx. 800px)'],
+  '等比例縮小 75%': ['Scale 75%', 'Escalar al 75%'],
+  '等比例縮小 50%': ['Scale 50%', 'Escalar al 50%'],
+  '自訂像素寬高...': ['Custom Pixels...', 'Píxeles Personalizados...'],
+  '不限制（依品質）': ['No Limit (By Quality)', 'Sin Límite (Por Calidad)'],
+  '壓到原檔 70%': ['70% of Original', '70% del Original'],
+  '壓到原檔 50%': ['50% of Original', '50% del Original'],
+  '壓到原檔 30%': ['30% of Original', '30% del Original'],
+  '壓到原檔 10%': ['10% of Original', '10% del Original'],
+  '每張不超過 10 MB': ['Max 10 MB each', 'Máx. 10 MB c/u'],
+  '每張不超過 5 MB': ['Max 5 MB each', 'Máx. 5 MB c/u'],
+  '每張不超過 2 MB': ['Max 2 MB each', 'Máx. 2 MB c/u'],
+  '每張不超過 1 MB': ['Max 1 MB each', 'Máx. 1 MB c/u'],
+  '每張不超過 500 KB': ['Max 500 KB each', 'Máx. 500 KB c/u'],
+  '自訂上限 (MB)...': ['Custom Max (MB)...', 'Límite Personalizado (MB)...']
+};
+
+const I18N_KEY = {
+  footer_priv: ['100% local browser processing, zero upload risk', '100% 本機瀏覽器運算，零資料上傳風險', '100% procesamiento local, cero riesgo de subida'],
+  img_drop_desc: ['Batch drag & drop or paste via <strong>Ctrl + V</strong>. Compare before & after quality with a split slider.', '支援批次拖曳與 <strong>Ctrl + V</strong> 剪貼簿直接貼上；轉檔完成後可點擊「對比」開啟前後滑動檢視', 'Arrastra en lote o pega con <strong>Ctrl + V</strong>. Compara la calidad antes y después con el deslizador.'],
+  pdf_drop_desc: ['Lazy-loads <strong>2,000+ page textbooks</strong> smoothly. Drag to reorder, merge, rotate, or delete pages.', '自動高解析渲染每頁縮圖，支援 <strong>拖曳排序、多檔合併、刪頁、旋轉</strong>；懸停縮圖即隨視角放大預覽', 'Carga fluida de <strong>PDFs de más de 2,000 páginas</strong>. Arrastra para ordenar, unir, rotar o eliminar páginas.'],
+  cmp_drop_desc: ['Re-samples and optimizes PDF pages locally. Ideal for <strong>mobile scans, slide decks, and large reports</strong>.', '智慧重新採樣頁面影像並重新封裝，特別適合 <strong>手機掃描檔、簡報與高畫質大圖報表</strong>', 'Optimiza páginas PDF localmente. Ideal para <strong>escaneos móviles, presentaciones y reportes pesados</strong>.'],
+  footer_cmd: ['Press <strong>Ctrl + K</strong> for quick commands', '按下 <strong>Ctrl + K</strong> 開啟快速指令', 'Presiona <strong>Ctrl + K</strong> para comandos rápidos'],
+  faq_a1: [
+    'All image encoding and PDF assembly run directly in your browser via Hardware Canvas & WebAssembly. Try the <strong>Airplane Mode Test</strong>: turn off Wi-Fi and convert files — everything works identically. You can also check <code>F12 → Network</code> to confirm zero upload requests.',
+    '所有影像編解碼與 PDF 重組都是透過瀏覽器內建的 Canvas 硬體加速與 WebAssembly 在你的裝置裡直接執行。你可以親自做<strong>「飛航模式測試」</strong>：打開本網頁後直接關掉 Wi-Fi 或開啟飛航模式，再拖曳圖片或 PDF 轉檔，依然 100% 正常運作；進階用戶也能按 <code>F12 → Network</code> 確認全程零檔案上傳請求。',
+    'Toda la codificación de imágenes y edición PDF ocurre directamente en tu navegador con Canvas y WebAssembly. Haz la <strong>Prueba de Modo Avión</strong>: apaga el Wi-Fi y convierte archivos — todo sigue funcionando igual. Revisa <code>F12 → Network</code> para confirmar cero subidas.'
+  ],
+  faq_a2: [
+    'Traditional cloud sites (like iLovePDF) pay for heavy server bandwidth, so they cap files at 100 MB and push monthly subscriptions. QuC is 100% static client-side with zero server costs, keeping every feature free forever.',
+    '傳統免費網站（如 iLovePDF）需要租用昂貴的雲端伺服器來接收與處理你的檔案，所以必須限制 100 MB、插滿廣告並推銷月費訂閱。QuC 採用純前端靜態架構，零伺服器運算成本，因此可以無條件免費開放所有功能。',
+    'Los sitios en la nube pagan servidores costosos, por eso limitan a 100 MB y cobran suscripciones. QuC es 100% estático en tu navegador sin costos de servidor, manteniendo todas las funciones gratis.'
+  ],
+  faq_a3: [
+    'QuC runs strictly inside your browser\'s security sandbox — no <code>.exe</code> installer is required and the page cannot access any other files on your drive. Works smoothly on iPhone (Safari) and Android (Chrome).',
+    '本工具完全運行於瀏覽器的安全沙盒（Sandbox）內，不需要下載任何 <code>.exe</code> 安裝檔，網頁也無法主動讀取你硬碟裡的其他檔案（只有你手動選取或拖入的檔案才會進入暫存記憶體）。iPhone（Safari）與 Android（Chrome）皆可直接開啟使用。',
+    'QuC se ejecuta dentro del sandbox seguro de tu navegador: sin instaladores <code>.exe</code> ni acceso a otros archivos de tu disco. Funciona perfectamente en iPhone (Safari) y Android (Chrome).'
+  ],
+  faq_a4: [
+    'QuC uses a 240px lightweight thumbnail pipeline, single-canvas reuse, PDF viewport lazy-loading (50/100 page chunks), and aggressive memory cleanup whenever you click Clear.',
+    'QuC 針對長時批次作業做了深度記憶體最佳化：圖片清單僅保留 240px 輕量縮圖、轉檔重用單一畫布並立即歸零釋放；PDF 採用視窗懶載入與每區 50／100 頁分頁顯示；按下「清空」會強制釋放所有暫存 Blob URL 與畫布記憶體。',
+    'QuC usa miniaturas ligeras de 240px, reutilización de un solo canvas, carga diferida de PDF (bloques de 50/100 págs.) y limpieza inmediata de memoria al pulsar Limpiar.'
+  ]
+};
+function setLang(lang) {
+  currentLang = (lang === 'en' || lang === 'es') ? lang : 'zh-TW';
+  document.documentElement.lang = currentLang;
+  document.title = L(
+    'QuC — Quick Converter | Free Offline Image & PDF Tool',
+    'QuC — Quick Converter | 極速離線圖片轉檔與 PDF 編排',
+    'QuC — Quick Converter | Conversor Gratis de Imágenes y PDF'
+  );
+  const kIdx = currentLang === 'en' ? 0 : currentLang === 'es' ? 2 : 1;
+  document.querySelectorAll('[data-i18n]').forEach(el => { const v = I18N_KEY[el.dataset.i18n]; if (v) el.textContent = v[kIdx]; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { const v = I18N_KEY[el.dataset.i18nHtml]; if (v) el.innerHTML = v[kIdx]; });
+  const ey = document.querySelector('.hero-eyebrow');
+  if (ey) ey.innerHTML = `<span>${L('On-Device Precision', '本機極速引擎', 'Precisión Local')}</span><span>·</span><span>${L('Zero Upload Privacy', '零上傳隱私', 'Cero Subidas')}</span>`;
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    if (!node.__i18nKey) {
+      const t = node.nodeValue.trim();
+      if (t && I18N_MAP[t]) node.__i18nKey = t;
+    }
+    const key = node.__i18nKey;
+    if (key && I18N_MAP[key]) {
+      node.nodeValue = currentLang === 'zh-TW' ? key : I18N_MAP[key][currentLang === 'es' ? 1 : 0];
+    }
+  }
+  document.querySelectorAll('select.ui-native-select option').forEach(o => {
+    if (!o.dataset.i18nOrig) o.dataset.i18nOrig = o.textContent.trim();
+    const orig = o.dataset.i18nOrig;
+    if (OPT_MAP[orig]) o.textContent = currentLang === 'zh-TW' ? orig : OPT_MAP[orig][currentLang === 'es' ? 1 : 0];
+  });
+  document.querySelectorAll('select.ui-native-select').forEach(s => s.dispatchEvent(new Event('change')));
+  $('custom_w').placeholder = L('Width px', '寬 px', 'Ancho px');
+  $('custom_h').placeholder = L('Height px', '高 px', 'Alto px');
+  $('cmd_search_input').placeholder = L('Search actions or switch workspace...', '搜尋功能或快速切換...', 'Buscar acciones o cambiar herramienta...');
+  $('pdf_jump_input').placeholder = L('Page', '頁碼', 'Pág.');
+  $('pdf_range_input').placeholder = L('e.g. 1-30, 500-520', '例：1-30, 500-520', 'ej. 1-30, 500-520');
+  $('lang_btn_label').textContent = currentLang === 'en' ? 'EN' : currentLang === 'es' ? 'ES' : '繁中';
+  if (imageQueue.length) renderImageList();
+  if (pdfPagesList.length) updatePageNumbers();
+  if (targetCompressFile) $('compress_info').textContent = `${targetCompressFile.name} · ${L('Original', '原始大小', 'Original')} ${formatSize(targetCompressFile.size)}`;
+  $('stat_processed').textContent = L(`${totalProcessed} files`, `${totalProcessed} 個檔案`, `${totalProcessed} archivos`);
+  updateTabIndicator();
+  try { localStorage.setItem('lfs_lang', currentLang); } catch (_) {}
+}
+function toggleLang() {
+  const order = ['en', 'es', 'zh-TW'];
+  const next = order[(order.indexOf(currentLang) + 1) % order.length];
+  setLang(next);
+  showToast(next === 'en' ? 'Language: English' : next === 'es' ? 'Idioma: Español' : '語言：繁體中文');
+}
+(() => {
+  let saved = '';
+  try { saved = localStorage.getItem('lfs_lang') || ''; } catch (_) {}
+  if (!saved) {
+    const nav = (navigator.language || '').toLowerCase();
+    saved = nav.startsWith('zh') ? 'zh-TW' : nav.startsWith('es') ? 'es' : 'en';
+  }
+  setLang(saved);
+})();
 </script>
 </body>
 </html>
