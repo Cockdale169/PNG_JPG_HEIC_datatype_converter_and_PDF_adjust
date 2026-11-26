@@ -2,8 +2,9 @@
 <html lang="zh-TW" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Local File Studio Pro — 極速轉檔與 PDF 編排工作台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" id="meta_theme_color" content="#000000">
+<title>QuC — Quick Converter | 極速離線圖片轉檔與 PDF 編排</title>
 <script src="vendor/pdf-lib.min.js"></script>
 <script src="vendor/pdf.min.js"></script>
 <script src="vendor/heic2any.min.js"></script>
@@ -14,10 +15,10 @@
 :root{
   --font-sans:system-ui,-apple-system,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei UI",sans-serif;
   --font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --bg:#000;--glass:rgba(22,22,27,.58);--glass-strong:rgba(20,20,26,.96);--glass-hover:rgba(34,34,42,.72);
-  --glass-header:rgba(8,8,11,.72);--glass-input:rgba(12,12,16,.58);--seg:rgba(255,255,255,.065);--seg-pill:rgba(255,255,255,.145);
-  --b1:rgba(255,255,255,.095);--b2:rgba(255,255,255,.15);--b-hover:rgba(255,255,255,.26);
-  --spec-top:rgba(255,255,255,.22);--spec-bot:rgba(0,0,0,.35);--spot:rgba(255,255,255,.065);--rim:rgba(120,195,255,.55);
+  --bg:#000;--glass:rgba(28,28,36,.64);--glass-strong:rgba(22,22,29,.96);--glass-hover:rgba(40,40,50,.76);
+  --glass-header:rgba(8,8,11,.76);--glass-input:rgba(14,14,20,.62);--seg:rgba(255,255,255,.075);--seg-pill:rgba(255,255,255,.16);
+  --b1:rgba(255,255,255,.13);--b2:rgba(255,255,255,.2);--b-hover:rgba(255,255,255,.32);
+  --spec-top:rgba(255,255,255,.3);--spec-bot:rgba(0,0,0,.38);--spot:rgba(255,255,255,.085);--rim:rgba(120,195,255,.65);
   --t1:#f5f5f7;--t2:#a1a1a6;--t3:#6e6e73;
   --accent:#2997ff;--accent-btn:#0071e3;--accent-soft:rgba(41,151,255,.15);--accent-glow:rgba(0,113,227,.42);
   --purple:#bf5af2;--green:#30d158;--green-soft:rgba(48,209,88,.14);--orange:#ff9f0a;--orange-soft:rgba(255,159,10,.15);--red:#ff453a;--red-soft:rgba(255,69,58,.14);
@@ -83,17 +84,16 @@ header{background:var(--glass-header);backdrop-filter:saturate(180%) blur(24px);
 .nav-pill-btn svg,.theme-btn svg{width:14px;height:14px;flex-shrink:0}
 
 /* HERO & BENTO */
-.hero-section{max-width:1200px;margin:0 auto;padding:38px 24px 10px;text-align:center;animation:reveal .75s var(--ease) both}
+.hero-section{max-width:1200px;margin:0 auto;padding:24px 24px 6px;text-align:center;animation:reveal .75s var(--ease) both}
 @keyframes reveal{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.hero-eyebrow{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;padding:5px 14px;border-radius:999px;background:var(--accent-soft);border:1px solid rgba(41,151,255,.24)}
-.hero-title{font-size:clamp(30px,4.4vw,52px);font-weight:700;letter-spacing:-.038em;line-height:1.1;background:var(--hero-grad);background-size:220% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px;animation:sweep 9s ease-in-out infinite}
-@keyframes sweep{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-.hero-subtitle{font-size:clamp(14px,1.55vw,16.5px);color:var(--t2);max-width:650px;margin:0 auto;line-height:1.58;letter-spacing:-.012em}
+.hero-eyebrow{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;padding:4px 12px;border-radius:999px;background:var(--accent-soft);border:1px solid rgba(41,151,255,.24)}
+.hero-title{font-size:clamp(26px,3.8vw,44px);font-weight:700;letter-spacing:-.035em;line-height:1.12;color:var(--t1);margin-bottom:8px}
+.hero-subtitle{font-size:clamp(13.5px,1.45vw,15.5px);color:var(--t2);max-width:650px;margin:0 auto;line-height:1.52;letter-spacing:-.012em}
 
-.bento-strip{max-width:1200px;margin:22px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;animation:reveal .8s var(--ease) .05s both}
-.bento-card{border-radius:var(--r-md);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:transform .28s var(--ease),border-color .28s}
+.bento-strip{max-width:1200px;margin:14px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;animation:reveal .8s var(--ease) .05s both}
+.bento-card{border-radius:var(--r-md);padding:10px 14px;display:flex;align-items:center;gap:10px;transition:transform .28s var(--ease),border-color .28s}
 .bento-card:hover{transform:translateY(-2px);border-color:var(--b-hover)}
-.bento-icon{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--b1)}
+.bento-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--b1)}
 .bento-icon.blue{color:var(--accent);background:var(--accent-soft);border-color:rgba(41,151,255,.25)}
 .bento-icon.green{color:var(--green);background:var(--green-soft);border-color:rgba(48,209,88,.25)}
 .bento-icon.purple{color:var(--purple);background:rgba(191,90,242,.14);border-color:rgba(191,90,242,.25)}
@@ -146,7 +146,8 @@ select.ui-native-select{position:absolute;width:1px;height:1px;opacity:0;pointer
 .ui-select-trigger .chev{width:14px;height:14px;color:var(--t3);flex-shrink:0;transition:transform .24s var(--ease),color .2s}
 .ui-select-trigger.open .chev{transform:rotate(180deg);color:var(--accent)}
 
-.ui-select-popover{position:fixed;z-index:1200;min-width:210px;max-height:320px;overflow-y:auto;padding:6px;border-radius:15px;background:var(--glass-strong);backdrop-filter:saturate(200%) blur(32px);-webkit-backdrop-filter:saturate(200%) blur(32px);border:1px solid var(--b2);box-shadow:var(--sh-float),inset 0 1px 0 var(--spec-top);opacity:0;transform:translateY(-6px) scale(.96);pointer-events:none;transition:opacity .18s var(--ease),transform .22s var(--ease)}
+.ui-select-popover{position:fixed;z-index:1200;min-width:210px;max-height:320px;overflow-y:auto;padding:6px;border-radius:15px;background:var(--glass-strong);backdrop-filter:saturate(200%) blur(32px);-webkit-backdrop-filter:saturate(200%) blur(32px);border:1px solid var(--b2);box-shadow:var(--sh-float),inset 0 1px 0 var(--spec-top);opacity:0;transform-origin:top center;transform:translateY(-6px) scale(.96);pointer-events:none;transition:opacity .18s var(--ease),transform .22s var(--ease)}
+.ui-select-popover.flip-up{transform-origin:bottom center;transform:translateY(6px) scale(.96)}
 .ui-select-popover.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
 .ui-select-option{width:100%;background:transparent;border:none;color:var(--t1);font-family:inherit;font-size:13px;font-weight:500;padding:8px 11px;border-radius:9px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;text-align:left;transition:background-color .14s,color .14s}
 .ui-select-option:hover{background:var(--accent-btn);color:#fff}
@@ -276,13 +277,15 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.16)}
 .tier-badge{font-family:var(--font-mono);font-size:10.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 7px;border-radius:999px}
 .tier-desc{font-size:12px;color:var(--t2);line-height:1.45}
 
-/* FLOATING ZOOM LOUPE (VIEWPORT-FOLLOWING, CLEAN HEADER) */
-.pdf-zoom-tooltip{display:none;position:fixed;left:0;top:0;z-index:9999;pointer-events:none;background:var(--glass-strong);backdrop-filter:saturate(180%) blur(28px);-webkit-backdrop-filter:saturate(180%) blur(28px);border:1px solid var(--b2);border-radius:16px;padding:10px 12px 12px;box-shadow:var(--sh-float);overflow:hidden;will-change:transform,opacity;transition:opacity .15s var(--ease);opacity:0}
+/* FLOATING ZOOM LOUPE (GOLDEN-RATIO FIXED-SIDE, ZERO JUMP) */
+.pdf-zoom-tooltip{display:none;position:fixed;left:0;top:0;z-index:9999;pointer-events:none;width:clamp(320px,30vw,440px);background:var(--glass-strong);backdrop-filter:saturate(180%) blur(28px);-webkit-backdrop-filter:saturate(180%) blur(28px);border:1px solid var(--b2);border-radius:18px;padding:12px 14px 14px;box-shadow:var(--sh-float);overflow:hidden;will-change:transform,opacity;transition:opacity .18s var(--ease),transform .22s var(--ease);opacity:0}
 .pdf-zoom-tooltip.visible{display:block;opacity:1}
-.loupe-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:0 2px;width:0;min-width:100%}
+.loupe-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:0 2px;width:100%}
 .pdf-zoom-label{font-size:11.5px;color:var(--t2);font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
-.pdf-zoom-tooltip canvas{display:block;border-radius:9px;background:#fff}
-#img_zoom_tooltip img{display:block;border-radius:9px;background:repeating-conic-gradient(var(--chk1) 0% 25%,var(--chk2) 0% 50%) 50%/16px 16px}
+.loupe-stage{width:100%;height:clamp(220px,40vh,350px);border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);overflow:hidden;border:1px solid var(--b1)}
+[data-theme="light"] .loupe-stage{background:rgba(0,0,0,.045)}
+.pdf-zoom-tooltip canvas{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:7px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+#img_zoom_tooltip img{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:7px;background:repeating-conic-gradient(var(--chk1) 0% 25%,var(--chk2) 0% 50%) 50%/16px 16px}
 
 /* PROGRESS, RING & MODALS */
 .result-card{border-radius:var(--r-lg);padding:24px 26px;display:flex;align-items:center;gap:20px;margin-top:20px;animation:panelIn .38s var(--ease) both}
@@ -330,22 +333,75 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.16)}
 .compare-badge{position:absolute;top:12px;padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:600;color:#fff;background:rgba(16,16,20,.72);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18);pointer-events:none}
 .compare-badge.left{left:12px}.compare-badge.right{right:12px}
 
-.toast-island{position:fixed;top:12px;left:50%;transform:translateX(-50%) translateY(-18px) scale(.92);z-index:1100;background:rgba(14,14,18,.9);backdrop-filter:saturate(180%) blur(24px);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:500;color:#f5f5f7;display:inline-flex;align-items:center;gap:9px;box-shadow:0 18px 44px rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .28s var(--ease),transform .38s var(--spring)}
+.toast-island{position:fixed;bottom:24px;top:auto;left:50%;transform:translateX(-50%) translateY(18px) scale(.92);z-index:1100;background:rgba(14,14,18,.92);backdrop-filter:saturate(180%) blur(24px);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:10px 18px;font-size:13px;font-weight:500;color:#f5f5f7;display:inline-flex;align-items:center;gap:9px;box-shadow:0 18px 44px rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .28s var(--ease),transform .38s var(--spring);max-width:calc(100vw - 32px);text-align:center}
 .toast-island.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
 .toast-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
 .toast-island.success .toast-dot{background:var(--green);box-shadow:0 0 10px var(--green)}
 
-footer{border-top:1px solid var(--b1);text-align:center;padding:24px;font-size:12px;color:var(--t3);background:var(--glass-header);backdrop-filter:blur(20px)}
-footer strong{color:var(--t2);font-weight:600}
+.mobile-preview-sheet{max-width:min(92vw,520px);padding:16px 16px 18px;text-align:left;border-radius:24px}
+.mobile-preview-stage{width:100%;aspect-ratio:1/1.2;max-height:58dvh;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.24);border:1px solid var(--b1);overflow:hidden;padding:8px}
+[data-theme="light"] .mobile-preview-stage{background:rgba(0,0,0,.045)}
+.mobile-preview-stage img,.mobile-preview-stage canvas{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;display:block}
+.mobile-preview-stage img{background:repeating-conic-gradient(var(--chk1) 0% 25%,var(--chk2) 0% 50%) 50%/16px 16px}
+.mobile-preview-stage canvas{background:#fff}
+.mobile-preview-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:12px;color:var(--t2)}
 
+footer{border-top:1px solid var(--b1);text-align:center;padding:24px;padding-bottom:calc(24px + env(safe-area-inset-bottom));font-size:12px;color:var(--t3);background:var(--glass-header);backdrop-filter:blur(20px)}
+footer strong{color:var(--t2);font-weight:600}
+.footer-link{background:none;border:none;color:var(--t2);font:inherit;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--b2);transition:color .2s}
+.footer-link:hover{color:var(--accent)}
+.legal-sheet{max-width:560px;text-align:left;padding:24px 26px}
+.legal-block{margin:14px 0;padding:12px 14px;border-radius:14px;background:var(--seg);border:1px solid var(--b1);font-size:12.5px;line-height:1.65;color:var(--t2)}
+.legal-block h4{font-size:12.5px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.legal-list{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:4px;font-family:var(--font-mono);font-size:11.5px}
+
+/* ABOUT LOCAL COMPUTE, FEATURES & FAQ (BELOW WORKSPACE) */
+.info-section{margin-top:60px;padding-top:40px;border-top:1px solid var(--b1);display:flex;flex-direction:column;gap:26px}
+.info-head{text-align:center;max-width:660px;margin:0 auto}
+.info-head h3{font-size:clamp(20px,2.4vw,26px);font-weight:700;letter-spacing:-.028em;margin-bottom:8px}
+.info-head p{font-size:13.5px;color:var(--t2);line-height:1.65}
+.feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.feature-card{border-radius:var(--r-lg);padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.feature-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:1px solid var(--b1)}
+.feature-icon.blue{color:var(--accent);background:var(--accent-soft);border-color:rgba(41,151,255,.26)}
+.feature-icon.green{color:var(--green);background:var(--green-soft);border-color:rgba(48,209,88,.26)}
+.feature-icon.purple{color:var(--purple);background:rgba(191,90,242,.14);border-color:rgba(191,90,242,.26)}
+.feature-icon svg{width:18px;height:18px}
+.feature-card h4{font-size:15px;font-weight:700;letter-spacing:-.015em}
+.feature-card p{font-size:13px;color:var(--t2);line-height:1.6}
+.flow-strip{border-radius:var(--r-lg);padding:18px 22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.flow-step{display:flex;align-items:flex-start;gap:11px}
+.flow-num{width:26px;height:26px;border-radius:999px;background:var(--accent-soft);border:1px solid rgba(41,151,255,.3);color:var(--accent);font-family:var(--font-mono);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.flow-body strong{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
+.flow-body span{font-size:12.5px;color:var(--t2);line-height:1.5}
+.faq-list{display:flex;flex-direction:column;gap:10px}
+.faq-item{border-radius:var(--r-md);overflow:hidden}
+.faq-item summary{list-style:none;padding:15px 20px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;user-select:none;transition:background-color .2s}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary:hover{background:var(--glass-hover)}
+.faq-item summary::after{content:'+';font-family:var(--font-mono);font-size:18px;font-weight:500;color:var(--t3);transition:transform .22s var(--ease),color .2s;flex-shrink:0}
+.faq-item[open] summary::after{transform:rotate(45deg);color:var(--accent)}
+.faq-ans{padding:12px 20px 16px;font-size:13px;color:var(--t2);line-height:1.68;border-top:1px solid var(--b1)}
+@media(max-width:900px){.feature-grid,.flow-strip{grid-template-columns:1fr}.info-section{margin-top:44px;padding-top:30px}}
+
+header{padding-top:env(safe-area-inset-top)}
 @media(max-width:960px){.bento-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.tier-grid{grid-template-columns:1fr}}
 @media(max-width:768px){
-  .header-inner{padding:10px 16px}.status-pill,.cmd-trigger-btn{display:none}.hero-section{padding:26px 16px 8px}
-  .bento-strip{padding:0 16px;gap:10px}.tabs-wrap{padding:0 12px}.tabs-nav{max-width:100%;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}.tabs-nav::-webkit-scrollbar{display:none}
-  .tab-btn{padding:9px 14px;font-size:12.5px;gap:6px}main{padding:18px 16px 48px}.ctrl-bar{flex-direction:column;align-items:stretch;padding:18px}.ctrl-divider{display:none}
-  .ctrl-actions{margin-left:0;width:100%;justify-content:flex-end}.ui-select-trigger{width:100%}.pdf-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}.result-card{flex-direction:column;align-items:flex-start}
+  *{-webkit-tap-highlight-color:transparent}
+  .header-inner{padding:10px 14px;gap:8px}.status-pill,.cmd-trigger-btn{display:none}.hero-section{padding:20px 16px 6px}
+  .brand-text h1{font-size:14.5px;white-space:nowrap}.nav-pill-btn{padding:6px 10px;font-size:11.5px;min-height:34px}.theme-btn{width:34px;height:34px}
+  .bento-strip{padding:0 16px;gap:8px}.tabs-wrap{padding:0 12px}.tabs-nav{max-width:100%;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}.tabs-nav::-webkit-scrollbar{display:none}
+  .tab-btn{padding:9px 14px;font-size:12.5px;gap:6px;min-height:40px}main{padding:16px 14px calc(48px + env(safe-area-inset-bottom))}.ctrl-bar{flex-direction:column;align-items:stretch;padding:16px}.ctrl-divider{display:none}
+  .ctrl-actions{margin-left:0;width:100%;justify-content:flex-end}.ui-select-trigger{width:100%;min-height:42px}.pdf-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.result-card{flex-direction:column;align-items:flex-start}
+  input[type="text"],input[type="number"]{font-size:16px}
+  .item-card{padding:12px 14px;gap:10px 12px;flex-wrap:wrap}.item-info{min-width:calc(100% - 74px)}.item-actions{width:100%;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--b1);gap:6px}.btn{min-height:40px}.btn-sm{min-height:34px;padding:6px 11px}
 }
-@media(max-width:480px){.bento-strip{grid-template-columns:1fr}.tab-btn{padding:8px 10px;font-size:11.5px;gap:5px}.tab-btn svg{width:14px;height:14px}}
+@media(max-width:480px){.bento-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.bento-card{padding:10px 11px;gap:8px}.bento-icon{width:28px;height:28px}.bento-val{font-size:12px;white-space:normal;line-height:1.25}.tabs-nav{width:100%;justify-content:space-between;padding:4px;gap:2px}.tab-btn{flex:1;justify-content:center;padding:8px 5px;font-size:11px;gap:4px}.tab-btn svg{width:13px;height:13px}}
+@media(hover:none),(pointer:coarse){
+  .pdf-zoom-tooltip,.zoom-hint,.rim-glow,.liquid-glass::after{display:none!important}
+  .item-thumb,.page-preview{cursor:pointer;touch-action:pan-y}
+  .btn,.icon-btn,.view-btn,.tab-btn,.ui-select-trigger{touch-action:manipulation}
+}
 </style>
 </head>
 <body>
@@ -355,11 +411,11 @@ footer strong{color:var(--t2);font-weight:600}
 <header>
   <div class="header-inner">
     <div class="brand">
-      <div class="brand-logo" onclick="triggerAmbientPulse()" title="Local File Studio Pro" aria-hidden="true">
+      <div class="brand-logo" onclick="triggerAmbientPulse()" title="QuC Pro" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5h6.5L10 22l9.5-11.5H13L13 2z"/></svg>
       </div>
       <div class="brand-text">
-        <h1>Local File Studio</h1>
+        <h1>QuC</h1>
         <span class="brand-pro-tag">Pro</span>
       </div>
     </div>
@@ -371,6 +427,10 @@ footer strong{color:var(--t2);font-weight:600}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <span>快速指令</span><span class="kbd-mini">Ctrl K</span>
       </button>
+      <a class="nav-pill-btn" href="https://github.com/Cockdale169/PNG_JPG_HEIC_datatype_converter_and_PDF_adjust" target="_blank" rel="noopener noreferrer" style="text-decoration:none" title="前往 GitHub 開源專案">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.31.1-2.73 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 6.84c.85 0 1.71.12 2.51.35 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.72 1.03 1.64 1.03 2.76 0 3.95-2.34 4.82-4.57 5.07.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.82 0 .27.18.59.69.49A10.26 10.26 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"/></svg>
+        <span>GitHub</span>
+      </a>
       <button class="nav-pill-btn" onclick="showBookmarkTip()" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
         <span>加入書籤</span>
@@ -478,6 +538,7 @@ footer strong{color:var(--t2);font-weight:600}
       </div>
       <div class="ctrl-actions">
         <button class="btn btn-primary" id="btn_convert_all" onclick="processAllImages()" disabled type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5h6.5L10 22l9.5-11.5H13L13 2z"/></svg><span>開始轉檔</span></button>
+        <button class="btn btn-secondary" id="btn_imgs_to_pdf" onclick="exportImagesToPdf()" disabled type="button" title="將清單內所有圖片依序合併為單一 PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg><span>合併為 PDF</span></button>
         <button class="btn btn-success" id="btn_zip_all" onclick="downloadAllZip()" style="display:none" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>打包下載 ZIP</span></button>
         <button class="btn btn-secondary btn-sm" onclick="clearImageList()" type="button">清空</button>
       </div>
@@ -525,6 +586,7 @@ footer strong{color:var(--t2);font-weight:600}
         <input type="file" id="pdf_append_input" class="file-input" accept=".pdf" multiple onchange="appendPdfFiles(this.files)">
         <button class="btn btn-secondary btn-sm" onclick="rotateAllPages(90)" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg><span>全部旋轉</span></button>
         <button class="btn btn-danger btn-sm" onclick="resetPdfStudio()" type="button">清空重來</button>
+        <button class="btn btn-secondary btn-sm" id="btn_export_pdf_imgs" onclick="exportPdfToImagesZip()" type="button" title="將目前所有頁面匯出為高畫質 JPG（多頁自動打包 ZIP）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>匯出為圖片</span></button>
         <button class="btn btn-success" id="btn_export_pdf" onclick="exportEditedPdf()" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>匯出 PDF</span></button>
       </div>
     </div>
@@ -615,23 +677,95 @@ footer strong{color:var(--t2);font-weight:600}
       <a id="btn_download_compressed_pdf" class="btn btn-success" download="compressed.pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>下載瘦身 PDF</span></a>
     </div>
   </div>
+
+  <!-- ABOUT LOCAL COMPUTE, FEATURES & FAQ -->
+  <section class="info-section" id="info_section" aria-label="關於本機運算與常見問題">
+    <div class="info-head">
+      <h3>為什麼選擇 QuC？100% 本機瀏覽器運算</h3>
+      <p>完全免費、無廣告、免註冊帳號。所有圖片轉檔與 PDF 處理都在你自己的裝置記憶體內完成，檔案永不離開你的電腦或手機。</p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card liquid-glass">
+        <div class="rim-glow"></div>
+        <div class="feature-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h4>零上傳隱私保護</h4>
+        <p>不同於傳統雲端轉檔網站，QuC 沒有任何上傳伺服器。身分證件、合約、病歷、財務報表與私人照片全程留在你的裝置裡處理，徹底杜絕外流風險。</p>
+      </div>
+      <div class="feature-card liquid-glass">
+        <div class="rim-glow"></div>
+        <div class="feature-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5h6.5L10 22l9.5-11.5H13L13 2z"/></svg></div>
+        <h4>無 100 MB 限制 · 千頁秒開</h4>
+        <p>因為不消耗雲端伺服器頻寬，沒有任何檔案大小上限或每日次數限制。內建 240px 輕量縮圖管線、PDF 懶載入與分區跳頁，千頁教科書也能順暢操作。</p>
+      </div>
+      <div class="feature-card liquid-glass">
+        <div class="rim-glow"></div>
+        <div class="feature-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <h4>桌機與手機皆順手</h4>
+        <p>桌機支援黃金比例側邊放大預覽與拖曳排序；手機（iOS / Android）自動切換為零干擾點按預覽與防誤觸滑動，開源核心引擎（PDF.js、pdf-lib、JSZip）透明可信。</p>
+      </div>
+    </div>
+
+    <div class="flow-strip liquid-glass">
+      <div class="rim-glow"></div>
+      <div class="flow-step"><span class="flow-num">1</span><div class="flow-body"><strong>拖曳、選取或 Ctrl + V 貼上</strong><span>一次丟入多張圖片（含 iPhone HEIC）或多份 PDF，立刻於本機載入。</span></div></div>
+      <div class="flow-step"><span class="flow-num">2</span><div class="flow-body"><strong>即時調整與預覽</strong><span>指定輸出格式、目標容量（KB/MB）、前後畫質滑動對比，或拖曳旋轉重排 PDF。</span></div></div>
+      <div class="flow-step"><span class="flow-num">3</span><div class="flow-body"><strong>一鍵下載並釋放記憶體</strong><span>單檔下載或打包成 ZIP；按下「清空」即主動釋放暫存畫布與記憶體。</span></div></div>
+    </div>
+
+    <div class="faq-list">
+      <details class="faq-item liquid-glass">
+        <summary>什麼是「100% 本機運算」？我要怎麼親眼驗證真的沒有上傳檔案？</summary>
+        <div class="faq-ans">所有影像編解碼與 PDF 重組都是透過瀏覽器內建的 Canvas 硬體加速與 WebAssembly 在你的裝置裡直接執行。你可以親自做<strong>「飛航模式測試」</strong>：打開本網頁後直接關掉 Wi-Fi 或開啟飛航模式，再拖曳圖片或 PDF 轉檔，依然 100% 正常運作；進階用戶也能按 <code>F12 → Network</code> 確認全程零檔案上傳請求。</div>
+      </details>
+      <details class="faq-item liquid-glass">
+        <summary>為什麼這裡完全免費、沒有廣告，也沒有 100 MB 檔案大小限制？</summary>
+        <div class="faq-ans">傳統免費網站（如 iLovePDF）需要租用昂貴的雲端伺服器來接收與處理你的檔案，所以必須限制 100 MB、插滿廣告並推銷月費訂閱。QuC 採用純前端靜態架構，零伺服器運算成本，因此可以無條件免費開放所有功能。</div>
+      </details>
+      <details class="faq-item liquid-glass">
+        <summary>免安裝就能用，會不會有中毒風險？手機也可以操作嗎？</summary>
+        <div class="faq-ans">本工具完全運行於瀏覽器的安全沙盒（Sandbox）內，不需要下載任何 <code>.exe</code> 安裝檔，網頁也無法主動讀取你硬碟裡的其他檔案（只有你手動選取或拖入的檔案才會進入暫存記憶體）。iPhone（Safari）與 Android（Chrome）皆可直接開啟使用。</div>
+      </details>
+      <details class="faq-item liquid-glass">
+        <summary>處理大量高解析度照片或上千頁 PDF 會不會讓瀏覽器越來越卡？</summary>
+        <div class="faq-ans">QuC 針對長時批次作業做了深度記憶體最佳化：圖片清單僅保留 240px 輕量縮圖、轉檔重用單一畫布並立即歸零釋放；PDF 採用視窗懶載入與每區 50／100 頁分頁顯示；按下「清空」會強制釋放所有暫存 Blob URL 與畫布記憶體。</div>
+      </details>
+    </div>
+  </section>
 </main>
 
 <!-- OVERLAYS -->
 <div id="img_zoom_tooltip" class="pdf-zoom-tooltip">
   <div class="loupe-header"><span class="pdf-zoom-label" id="img_zoom_label"></span></div>
-  <img id="img_zoom_img" alt="">
+  <div class="loupe-stage"><img id="img_zoom_img" alt=""></div>
 </div>
 <div id="pdf_zoom_tooltip" class="pdf-zoom-tooltip">
   <div class="loupe-header"><span class="pdf-zoom-label" id="pdf_zoom_label">第 1 頁</span></div>
-  <canvas id="pdf_zoom_canvas"></canvas>
+  <div class="loupe-stage"><canvas id="pdf_zoom_canvas"></canvas></div>
+</div>
+
+<div class="modal-backdrop" id="mobile_preview_modal" onclick="if(event.target===this)closeMobilePreview()">
+  <div class="modal-sheet mobile-preview-sheet" role="dialog" aria-modal="true" aria-labelledby="mobile_preview_title">
+    <div class="compare-header" style="margin-bottom:10px">
+      <span id="mobile_preview_title" style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">預覽</span>
+      <button class="icon-btn" onclick="closeMobilePreview()" type="button" aria-label="關閉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mobile-preview-stage" id="mobile_preview_stage">
+      <img id="mobile_preview_img" style="display:none" alt="">
+      <canvas id="mobile_preview_canvas" style="display:none"></canvas>
+    </div>
+    <div class="mobile-preview-foot">
+      <span id="mobile_preview_meta"></span>
+      <button class="btn btn-secondary btn-sm" onclick="closeMobilePreview()" type="button">關閉</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-backdrop" id="bookmark_modal" onclick="if(event.target===this)closeBookmarkTip()">
   <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="bookmark_modal_title">
     <div class="modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
     <h3 class="modal-title" id="bookmark_modal_title">加入瀏覽器書籤</h3>
-    <p class="modal-desc">按下快捷鍵即可將 Local File Studio Pro 釘選至書籤列，日後一鍵極速開啟，完全離線隨時可用。</p>
+    <p class="modal-desc">按下快捷鍵即可將 QuC Pro 釘選至書籤列，日後一鍵極速開啟，完全離線隨時可用。</p>
     <div class="kbd-row"><span class="kbd-key">Ctrl</span><span class="kbd-plus">+</span><span class="kbd-key">D</span><span class="kbd-plus" style="margin:0 6px">/</span><span class="kbd-key">⌘</span><span class="kbd-plus">+</span><span class="kbd-key">D</span></div>
     <button class="btn btn-primary" style="width:100%" onclick="closeBookmarkTip()" type="button">知道了</button>
   </div>
@@ -671,10 +805,39 @@ footer strong{color:var(--t2);font-weight:600}
   </div>
 </div>
 
+<div class="modal-backdrop" id="legal_modal" onclick="if(event.target===this)closeLegalModal()">
+  <div class="modal-sheet legal-sheet" role="dialog" aria-modal="true" aria-labelledby="legal_modal_title">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h3 class="modal-title" id="legal_modal_title" style="margin:0">隱私聲明、免責條款與開源授權</h3>
+      <button class="icon-btn" onclick="closeLegalModal()" type="button" aria-label="關閉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="legal-block">
+      <h4>隱私保護（Privacy Policy）</h4>
+      本工具 100% 於您的瀏覽器本機記憶體中執行轉檔與 PDF 處理，絕不將任何檔案、影像或個人資料上傳、傳送或儲存至任何遠端伺服器。
+    </div>
+    <div class="legal-block">
+      <h4>免責條款（Terms &amp; Disclaimer）</h4>
+      本軟體依「現況（AS-IS）」提供，不附帶任何明示或默示保證。進行大量檔案壓縮或 PDF 頁面編排前，請務必自行保留原始檔案備份。
+    </div>
+    <div class="legal-block">
+      <h4>第三方開源授權（Open Source Licenses）</h4>
+      本工具依原開源授權條款使用下列套件（完整聲明見 <code>THIRD_PARTY_LICENSES.txt</code>）：
+      <ul class="legal-list">
+        <li>• pdf-lib — MIT License (github.com/Hopding/pdf-lib)</li>
+        <li>• PDF.js — Apache-2.0 License (github.com/mozilla/pdf.js)</li>
+        <li>• JSZip — MIT License (github.com/Stuk/jszip)</li>
+        <li>• SortableJS — MIT License (github.com/SortableJS/Sortable)</li>
+        <li>• heic2any / libheif — MIT / LGPL-3.0 (github.com/alexcorvi/heic2any)</li>
+      </ul>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:6px" onclick="closeLegalModal()" type="button">了解並關閉</button>
+  </div>
+</div>
+
 <div class="toast-island" id="toast_island" role="status" aria-live="polite"><span class="toast-dot"></span><span id="toast_text"></span></div>
 <div class="ui-select-popover" id="ui_select_popover" role="listbox"></div>
 
-<footer><strong>Local File Studio Pro</strong> &nbsp;·&nbsp; 100% 本機瀏覽器運算，零資料上傳風險 &nbsp;·&nbsp; 按下 <strong>Ctrl + K</strong> 開啟快速指令面板</footer>
+<footer><strong>QuC Pro</strong> &nbsp;·&nbsp; 100% 本機瀏覽器運算，零資料上傳風險 &nbsp;·&nbsp; 按下 <strong>Ctrl + K</strong> 開啟快速指令 &nbsp;·&nbsp; <a class="footer-link" href="https://github.com/Cockdale169/PNG_JPG_HEIC_datatype_converter_and_PDF_adjust" target="_blank" rel="noopener noreferrer">GitHub 開源專案</a> &nbsp;·&nbsp; <button type="button" class="footer-link" onclick="openLegalModal()">隱私條款與開源授權</button></footer>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -744,11 +907,12 @@ document.addEventListener('pointermove', e => {
   });
 }, { passive: true });
 
-// [UI] Viewport-centered opposite-side preview (always tracks current scrolled viewport)
-function positionFloatingPreview(el, cx) {
-  const GAP = 20, tw = el.offsetWidth, th = el.offsetHeight;
-  const x = cx > innerWidth / 2 ? GAP : Math.max(GAP, innerWidth - tw - GAP);
-  const y = Math.max(GAP, (innerHeight - th) / 2);
+// [UI] Golden-Ratio Fixed-Side Preview (top-safe, zero left/right jumping)
+function positionFloatingPreview(el, anchorRect) {
+  const GAP = 24, TOP_SAFE = 78, tw = el.offsetWidth || 380, th = el.offsetHeight || 340;
+  const onRightCard = anchorRect && typeof anchorRect === 'object' ? (anchorRect.left + anchorRect.width * 0.5) > innerWidth * 0.58 : (anchorRect > innerWidth * 0.58);
+  const x = onRightCard ? GAP : Math.max(GAP, innerWidth - tw - GAP);
+  const y = Math.max(TOP_SAFE, Math.min(innerHeight - th - GAP, (innerHeight - th) / 2));
   el.style.transform = `translate3d(${Math.round(x)}px,${Math.round(y)}px,0)`;
 }
 
@@ -794,12 +958,20 @@ document.querySelectorAll('select.ui-native-select').forEach(sel => {
       frag.appendChild(b);
     }
     selectPopover.replaceChildren(frag);
-    const r = tr.getBoundingClientRect();
+    selectPopover.scrollTop = 0;
+    const r = tr.getBoundingClientRect(), pad = 12, gap = 6;
+    const spaceBelow = innerHeight - r.bottom - pad - gap, spaceAbove = r.top - pad - gap;
     selectPopover.style.minWidth = Math.max(r.width, 200) + 'px';
+    selectPopover.style.maxHeight = '320px';
+    const naturalH = Math.min(selectPopover.scrollHeight, 320);
+    const openUp = spaceBelow < naturalH && spaceAbove > spaceBelow;
+    const avail = Math.max(120, Math.min(320, openUp ? spaceAbove : spaceBelow));
+    selectPopover.style.maxHeight = avail + 'px';
+    const finalH = Math.min(selectPopover.scrollHeight, avail);
+    selectPopover.classList.toggle('flip-up', openUp);
+    selectPopover.style.top = (openUp ? Math.max(pad, r.top - finalH - gap) : Math.min(innerHeight - finalH - pad, r.bottom + gap)) + 'px';
+    selectPopover.style.left = Math.max(pad, Math.min(r.left, innerWidth - selectPopover.offsetWidth - pad)) + 'px';
     selectPopover.classList.add('open');
-    const ph = selectPopover.offsetHeight, sb = innerHeight - r.bottom - 14;
-    selectPopover.style.top = (sb >= ph || sb >= 180 ? r.bottom + 6 : Math.max(12, r.top - ph - 6)) + 'px';
-    selectPopover.style.left = Math.max(12, Math.min(r.left, innerWidth - selectPopover.offsetWidth - 12)) + 'px';
   });
 });
 document.addEventListener('click', closeSelect);
@@ -818,18 +990,28 @@ function showToast(msg, ok = false) {
   $('toast_text').textContent = msg; el.classList.toggle('success', ok); el.classList.add('show');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
-function applyTheme(t) {
+function applyTheme(t, persist = true) {
   document.documentElement.setAttribute('data-theme', t);
   $('theme_icon_sun').style.display = t === 'dark' ? '' : 'none';
   $('theme_icon_moon').style.display = t === 'light' ? '' : 'none';
-  try { localStorage.setItem('lfs_theme', t); } catch (_) {}
+  const mt = $('meta_theme_color');
+  if (mt) mt.setAttribute('content', t === 'light' ? '#f5f5f7' : '#000000');
+  if (persist) { try { localStorage.setItem('lfs_theme', t); } catch (_) {} }
 }
 function toggleTheme() {
   const next = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
-  applyTheme(next); triggerAmbientPulse();
+  applyTheme(next, true); triggerAmbientPulse();
   showToast(next === 'dark' ? '已切換至深色 Pro 外觀' : '已切換至淺色 Studio 外觀');
 }
-try { const s = localStorage.getItem('lfs_theme'); if (s === 'light' || s === 'dark') applyTheme(s); } catch (_) {}
+(() => {
+  let saved = '';
+  try { saved = localStorage.getItem('lfs_theme') || ''; } catch (_) {}
+  if (saved === 'light' || saved === 'dark') applyTheme(saved, false);
+  else {
+    const hr = new Date().getHours();
+    applyTheme(hr >= 6 && hr < 18 ? 'light' : 'dark', false);
+  }
+})();
 
 function updateTabIndicator() {
   const a = document.querySelector('.tab-btn.active'), ind = $('tab_indicator');
@@ -846,6 +1028,8 @@ updateQualitySlider($('img_quality_slider'));
 
 function showBookmarkTip() { $('bookmark_modal').classList.add('open'); }
 function closeBookmarkTip() { $('bookmark_modal').classList.remove('open'); }
+function openLegalModal() { $('legal_modal').classList.add('open'); }
+function closeLegalModal() { $('legal_modal').classList.remove('open'); }
 function openCmdPalette() { $('cmd_modal').classList.add('open'); const i = $('cmd_search_input'); i.value = ''; filterCmdItems(''); setTimeout(() => i.focus(), 50); }
 function closeCmdPalette() { $('cmd_modal').classList.remove('open'); }
 function runCmd(fn) { closeCmdPalette(); fn(); }
@@ -855,8 +1039,60 @@ function filterCmdItems(q) {
 }
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCmdPalette(); }
-  else if (e.key === 'Escape') { closeBookmarkTip(); closeCmdPalette(); closeCompareModal(); closeSelect(); }
+  else if (e.key === 'Escape') { closeBookmarkTip(); closeLegalModal(); closeCmdPalette(); closeCompareModal(); closeMobilePreview(); closeSelect(); }
 });
+
+// [MOBILE] Golden-Ratio Tap Lightbox (zero scroll interference on iOS & Android)
+const canHover = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
+let mobilePreviewUrl = '', mobilePreviewTok = 0;
+function closeMobilePreview() {
+  mobilePreviewTok++;
+  $('mobile_preview_modal').classList.remove('open');
+  const img = $('mobile_preview_img'), cv = $('mobile_preview_canvas');
+  img.style.display = 'none'; img.removeAttribute('src');
+  cv.style.display = 'none'; cv.width = cv.height = 0;
+  if (mobilePreviewUrl) { URL.revokeObjectURL(mobilePreviewUrl); mobilePreviewUrl = ''; }
+}
+function openMobileImgPreview(item) {
+  const srcBlob = item?.convertedBlob || (item?.isHeic ? item.heicBlob : item?.file);
+  if (!srcBlob) return;
+  closeMobilePreview();
+  const img = $('mobile_preview_img');
+  mobilePreviewUrl = URL.createObjectURL(srcBlob);
+  img.src = mobilePreviewUrl;
+  img.style.display = 'block';
+  const dims = item.status === 'done' && item.outW ? `${item.outW}×${item.outH}px` : (item.origW ? `${item.origW}×${item.origH}px` : '');
+  $('mobile_preview_title').textContent = item.name;
+  $('mobile_preview_meta').textContent = `${item.status === 'done' ? '轉檔後' : '原圖'}${dims ? ' · ' + dims : ''} · ${formatSize(item.convertedBlob ? item.convertedSize : item.size)}`;
+  $('mobile_preview_modal').classList.add('open');
+}
+async function openMobilePdfPreview(p) {
+  if (!p?.pdfDoc) return;
+  closeMobilePreview();
+  const tok = ++mobilePreviewTok;
+  $('mobile_preview_title').textContent = `第 ${p.pageNum} 頁 · ${p.sourceFileName}`;
+  $('mobile_preview_meta').textContent = '渲染中...';
+  $('mobile_preview_modal').classList.add('open');
+  try {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const page = await p.pdfDoc.getPage(p.pageIndex + 1);
+    if (tok !== mobilePreviewTok) { page.cleanup(); return; }
+    const rot = ((page.rotate || 0) + p.rotation) % 360;
+    const base = page.getViewport({ scale: 1, rotation: rot });
+    const maxW = Math.min(innerWidth * 0.84, 460), maxH = Math.min(innerHeight * 0.54, 480);
+    const fit = Math.min(maxW / base.width, maxH / base.height);
+    const vp = page.getViewport({ scale: fit * dpr, rotation: rot });
+    const cv = $('mobile_preview_canvas');
+    cv.width = Math.floor(vp.width); cv.height = Math.floor(vp.height);
+    cv.style.width = Math.round(vp.width / dpr) + 'px'; cv.style.height = Math.round(vp.height / dpr) + 'px';
+    const ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    page.cleanup();
+    if (tok !== mobilePreviewTok) { cv.width = cv.height = 0; return; }
+    cv.style.display = 'block';
+    $('mobile_preview_meta').textContent = `${Math.round(base.width)}×${Math.round(base.height)} pt`;
+  } catch (e) { console.warn('手機預覽渲染失敗', e); }
+}
 
 // [UI] Before/After Split Compare
 const cmpStage = $('compare_stage'), cmpAfter = $('compare_after_wrap'), cmpDiv = $('compare_divider');
@@ -865,18 +1101,29 @@ const setCmp = x => { const r = cmpStage.getBoundingClientRect(), p = Math.max(0
 cmpStage.addEventListener('pointerdown', e => { cmpDrag = true; cmpStage.setPointerCapture(e.pointerId); setCmp(e.clientX); });
 cmpStage.addEventListener('pointermove', e => { if (cmpDrag) setCmp(e.clientX); });
 cmpStage.addEventListener('pointerup', () => { cmpDrag = false; });
+let cmpBeforeUrl = '', cmpAfterUrl = '';
 function openCompareModal(id) {
   const item = imageQueue.find(i => i.id === id);
   if (!item?.convertedBlob) return;
-  $('compare_before_img').src = item.origPreviewUrl || item.previewUrl;
-  $('compare_after_img').src = item.previewUrl;
+  closeCompareModal();
+  const origSrc = item.heicBlob || item.file;
+  cmpBeforeUrl = origSrc ? URL.createObjectURL(origSrc) : '';
+  cmpAfterUrl = URL.createObjectURL(item.convertedBlob);
+  $('compare_before_img').src = cmpBeforeUrl;
+  $('compare_after_img').src = cmpAfterUrl;
   $('compare_title').textContent = `前後畫質對比 — ${item.name}`;
   $('compare_before_badge').textContent = `原圖 · ${formatSize(item.size)}`;
   $('compare_after_badge').textContent = `轉檔後 · ${formatSize(item.convertedSize)}`;
   cmpAfter.style.clipPath = 'inset(0 0 0 50%)'; cmpDiv.style.left = '50%';
   $('compare_modal').classList.add('open');
 }
-function closeCompareModal() { $('compare_modal').classList.remove('open'); }
+function closeCompareModal() {
+  $('compare_modal').classList.remove('open');
+  $('compare_before_img').removeAttribute('src');
+  $('compare_after_img').removeAttribute('src');
+  if (cmpBeforeUrl) { URL.revokeObjectURL(cmpBeforeUrl); cmpBeforeUrl = ''; }
+  if (cmpAfterUrl) { URL.revokeObjectURL(cmpAfterUrl); cmpAfterUrl = ''; }
+}
 function selectCompressTier(card) {
   document.querySelectorAll('#pdf_tier_grid .tier-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected'); $('pdf_compress_profile').value = card.dataset.profile;
@@ -944,61 +1191,155 @@ function toggleLockRatio() {
 function onCustomWChange() { if (isRatioLocked && customAspectRatio) { const w = +$('custom_w').value; if (w) $('custom_h').value = Math.round(w / customAspectRatio); } }
 function onCustomHChange() { if (isRatioLocked && customAspectRatio) { const h = +$('custom_h').value; if (h) $('custom_w').value = Math.round(h * customAspectRatio); } }
 
+let imgSessionId = 0, thumbChain = Promise.resolve();
+async function makeSmallThumb(blob, maxDim = 240) {
+  if (typeof createImageBitmap === 'function') {
+    let bmp = null;
+    try {
+      bmp = await createImageBitmap(blob);
+      const w = bmp.width, h = bmp.height, sc = Math.min(1, maxDim / Math.max(w, h, 1));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(w * sc)); c.height = Math.max(1, Math.round(h * sc));
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#141418'; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(bmp, 0, 0, c.width, c.height);
+      bmp.close(); bmp = null;
+      const b = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.78));
+      c.width = c.height = 0;
+      if (!b) throw new Error('縮圖產生失敗');
+      return { url: URL.createObjectURL(b), w, h };
+    } catch (_) {
+      if (bmp) try { bmp.close(); } catch (__) {}
+    }
+  }
+  return new Promise((res, rej) => {
+    const img = new Image(), u = URL.createObjectURL(blob);
+    img.onload = () => {
+      URL.revokeObjectURL(u);
+      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      const sc = Math.min(1, maxDim / Math.max(w, h, 1));
+      const tw = Math.max(1, Math.round(w * sc)), th = Math.max(1, Math.round(h * sc));
+      const c = document.createElement('canvas'); c.width = tw; c.height = th;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#141418'; ctx.fillRect(0, 0, tw, th);
+      ctx.drawImage(img, 0, 0, tw, th);
+      img.onload = img.onerror = null; img.removeAttribute('src');
+      c.toBlob(b => {
+        c.width = c.height = 0;
+        if (!b) return rej(new Error('縮圖產生失敗'));
+        res({ url: URL.createObjectURL(b), w, h });
+      }, 'image/jpeg', 0.78);
+    };
+    img.onerror = e => { URL.revokeObjectURL(u); img.onload = img.onerror = null; img.removeAttribute('src'); rej(e); };
+    img.src = u;
+  });
+}
+
+function updateImageCard(item) {
+  const card = $('card_' + item.id);
+  if (!card) return;
+  card.className = 'item-card liquid-glass' + (item.status !== 'ready' ? ` status-${item.status}` : '');
+  const img = card.querySelector('.item-thumb');
+  if (img && item.thumbUrl && img.src !== item.thumbUrl) img.src = item.thumbUrl;
+  const meta = card.querySelector('.item-meta');
+  if (meta) {
+    let st = '<span class="tag tag-neutral">待處理</span>';
+    if (item.status === 'converting') st = `<span class="tag tag-active"><span class="spinner" style="width:10px;height:10px;border-width:2px"></span>處理中</span>`;
+    else if (item.status === 'done') {
+      const sv = Math.round((1 - item.convertedSize / item.size) * 100);
+      const miss = item.targetBytes && item.convertedSize > item.targetBytes * 1.02;
+      st = `<span class="tag tag-success">✓ ${item.outW}×${item.outH}px · ${formatSize(item.convertedSize)}</span><span class="tag ${sv >= 0 ? 'tag-success' : 'tag-active'}">${sv >= 0 ? '縮小 ' + sv + '%' : '變大 ' + (-sv) + '%'}</span>${miss ? '<span class="tag tag-danger">未達目標</span>' : ''}`;
+    } else if (item.status === 'error') st = '<span class="tag tag-danger">✕ 失敗</span>';
+    meta.innerHTML = `<span>${item.origW ? `${item.origW}×${item.origH}px · ` : ''}${formatSize(item.size)}</span>${item.isHeic ? '<span class="tag tag-heic">HEIC</span>' : ''}${st}`;
+  }
+  const acts = card.querySelector('.item-actions');
+  if (acts) {
+    acts.innerHTML = `${item.convertedBlob ? `<button class="btn btn-secondary btn-sm" onclick="openCompareModal('${item.id}')" type="button" title="前後畫質對比">${ICONS.cmp}<span>對比</span></button><button class="btn btn-secondary btn-sm" onclick="downloadSingleImage('${item.id}')" type="button">${ICONS.dl}<span>下載</span></button>` : ''}<button class="icon-btn danger" onclick="removeImage('${item.id}')" title="移除" type="button">${ICONS.x}</button>`;
+  }
+}
+
 function revokeItemUrls(item) {
-  if (item.origPreviewUrl) URL.revokeObjectURL(item.origPreviewUrl);
-  if (item.previewUrl && item.previewUrl !== item.origPreviewUrl) URL.revokeObjectURL(item.previewUrl);
+  if (!item) return;
+  if (item.thumbUrl) { URL.revokeObjectURL(item.thumbUrl); item.thumbUrl = ''; }
+  item.file = item.convertedBlob = item.heicBlob = null;
 }
 async function handleImageFiles(fileList) {
   const files = Array.from(fileList || []).filter(f => /\.(heic|heif|png|jpe?g|webp|bmp)$/i.test(f.name) || f.type.startsWith('image/'));
   if (!files.length) return;
+  const sid = imgSessionId;
   const added = [];
   for (const file of files) {
     const isHeic = /\.(heic|heif)$/i.test(file.name);
-    const u = isHeic ? '' : URL.createObjectURL(file);
-    const item = { id: 'img_' + Math.random().toString(36).slice(2, 11), file, name: file.name, size: file.size, isHeic, status: 'ready', convertedBlob: null, convertedSize: 0, origPreviewUrl: u, previewUrl: u, origW: null, origH: null, heicBlob: null };
+    const item = { id: 'img_' + Math.random().toString(36).slice(2, 11), file, name: file.name, size: file.size, isHeic, status: 'ready', convertedBlob: null, convertedSize: 0, thumbUrl: '', origW: null, origH: null, heicBlob: null };
     imageQueue.push(item); added.push(item);
   }
-  renderImageList(); $('btn_convert_all').disabled = false; triggerAmbientPulse(); showToast(`已載入 ${added.length} 張圖片`);
+  renderImageList(); $('btn_convert_all').disabled = false; $('btn_imgs_to_pdf').disabled = false; triggerAmbientPulse(); showToast(`已載入 ${added.length} 張圖片`);
   for (const item of added) {
-    if (!item.isHeic) getImageDimensions(item.file).then(d => { item.origW = d.w; item.origH = d.h; renderImageList(); }).catch(() => {});
-    else heicChain = heicChain.then(async () => {
-      if (!imageQueue.includes(item)) return;
-      try {
-        let b = await heic2any({ blob: item.file, toType: 'image/jpeg', quality: .92 });
-        if (Array.isArray(b)) b = b[0];
-        item.heicBlob = b; const u = URL.createObjectURL(b); item.origPreviewUrl = u;
-        if (!item.convertedBlob) item.previewUrl = u;
-        const d = await getImageDimensions(b); item.origW = d.w; item.origH = d.h; renderImageList();
-      } catch (e) { console.warn('HEIC 預覽失敗', item.name, e); }
-    });
+    if (!item.isHeic) {
+      thumbChain = thumbChain.then(async () => {
+        if (sid !== imgSessionId || !imageQueue.includes(item) || !item.file) return;
+        try {
+          const r = await makeSmallThumb(item.file, 240);
+          if (sid !== imgSessionId || !imageQueue.includes(item)) { URL.revokeObjectURL(r.url); return; }
+          if (item.thumbUrl) URL.revokeObjectURL(item.thumbUrl);
+          item.thumbUrl = r.url; item.origW = r.w; item.origH = r.h;
+          updateImageCard(item);
+        } catch (e) { console.warn('縮圖產生失敗', item.name, e); }
+      });
+    } else {
+      heicChain = heicChain.then(async () => {
+        if (sid !== imgSessionId || !imageQueue.includes(item) || !item.file) return;
+        try {
+          let b = await heic2any({ blob: item.file, toType: 'image/jpeg', quality: .92 });
+          if (Array.isArray(b)) b = b[0];
+          if (sid !== imgSessionId || !imageQueue.includes(item)) return;
+          item.heicBlob = b;
+          const r = await makeSmallThumb(b, 240);
+          if (sid !== imgSessionId || !imageQueue.includes(item)) { URL.revokeObjectURL(r.url); return; }
+          if (item.thumbUrl) URL.revokeObjectURL(item.thumbUrl);
+          item.thumbUrl = r.url; item.origW = r.w; item.origH = r.h;
+          updateImageCard(item);
+        } catch (e) { console.warn('HEIC 預覽失敗', item.name, e); }
+      });
+    }
   }
 }
 
 const imgZoomTip = $('img_zoom_tooltip'), imgZoomImg = $('img_zoom_img'), imgZoomLabel = $('img_zoom_label');
-let imgZoomToken = 0, imgZoomActive = false;
-function hideImgZoom() { imgZoomToken++; imgZoomActive = false; imgZoomTip.classList.remove('visible'); }
-function showImgZoom(item, cx, cy) {
-  if (!item?.previewUrl) return;
+let imgZoomToken = 0, imgZoomActive = false, imgZoomUrl = '';
+function hideImgZoom() {
+  imgZoomToken++; imgZoomActive = false; imgZoomTip.classList.remove('visible');
+  imgZoomImg.onload = null; imgZoomImg.removeAttribute('src');
+  if (imgZoomUrl) { URL.revokeObjectURL(imgZoomUrl); imgZoomUrl = ''; }
+}
+function showImgZoom(item, anchorRect) {
+  const srcBlob = item?.convertedBlob || item?.heicBlob || (!item?.isHeic ? item?.file : null);
+  if (!srcBlob) return;
+  hideImgZoom();
   const tok = ++imgZoomToken;
-  imgZoomImg.style.maxWidth = Math.min(innerWidth * .48, 960) + 'px';
-  imgZoomImg.style.maxHeight = (innerHeight * .82 - 44) + 'px';
+  const u = URL.createObjectURL(srcBlob);
+  imgZoomUrl = u;
   imgZoomImg.onload = () => {
     if (tok !== imgZoomToken) return;
     const dims = item.status === 'done' && item.outW ? `${item.outW}×${item.outH}px` : (item.origW ? `${item.origW}×${item.origH}px` : '');
     imgZoomLabel.textContent = `${item.status === 'done' ? '轉檔後' : '原圖'} · ${dims} · ${item.name}`;
     imgZoomTip.classList.add('visible'); imgZoomActive = true;
-    positionFloatingPreview(imgZoomTip, cx, cy);
+    positionFloatingPreview(imgZoomTip, anchorRect);
   };
-  imgZoomImg.src = item.previewUrl;
+  imgZoomImg.src = u;
 }
 const imgListEl = $('img_list');
-imgListEl.addEventListener('mouseover', e => { const t = e.target.closest('.item-thumb'); if (t) showImgZoom(imageQueue.find(i => i.id === t.dataset.id), e.clientX, e.clientY); });
-imgListEl.addEventListener('mousemove', e => { if (imgZoomActive && e.target.closest('.item-thumb')) positionFloatingPreview(imgZoomTip, e.clientX, e.clientY); }, { passive: true });
+imgListEl.addEventListener('mouseover', e => {
+  if (!canHover()) return;
+  const t = e.target.closest('.item-thumb');
+  if (t) showImgZoom(imageQueue.find(i => i.id === t.dataset.id), t.getBoundingClientRect());
+});
 imgListEl.addEventListener('mouseout', e => { if (e.target.closest('.item-thumb')) hideImgZoom(); });
-
-function getImageDimensions(file) {
-  return new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file); img.onload = () => { URL.revokeObjectURL(u); res({ w: img.width, h: img.height }); }; img.onerror = rej; img.src = u; });
-}
+imgListEl.addEventListener('click', e => {
+  if (canHover()) return;
+  const t = e.target.closest('.item-thumb');
+  if (t) { const it = imageQueue.find(i => i.id === t.dataset.id); if (it) openMobileImgPreview(it); }
+});
 
 function renderImageList() {
   const frag = document.createDocumentFragment();
@@ -1006,7 +1347,7 @@ function renderImageList() {
     const card = document.createElement('div');
     card.className = 'item-card liquid-glass' + (item.status !== 'ready' ? ` status-${item.status}` : '');
     card.id = 'card_' + item.id;
-    const thumb = item.previewUrl || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="58" height="58"><rect width="58" height="58" fill="%23141418" rx="12"/><text x="29" y="33" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="11" fill="%2386868b">HEIC</text></svg>`;
+    const thumb = item.thumbUrl || `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='58' height='58'><rect width='58' height='58' fill='%23141418' rx='12'/><text x='29' y='33' text-anchor='middle' font-family='sans-serif' font-weight='600' font-size='11' fill='%2386868b'>${item.isHeic ? 'HEIC' : 'IMG'}</text></svg>`;
     let st = '<span class="tag tag-neutral">待處理</span>';
     if (item.status === 'converting') st = `<span class="tag tag-active"><span class="spinner" style="width:10px;height:10px;border-width:2px"></span>處理中</span>`;
     else if (item.status === 'done') {
@@ -1024,21 +1365,33 @@ function renderImageList() {
 }
 
 function removeImage(id) {
+  hideImgZoom(); closeCompareModal();
+  const card = $('card_' + id);
+  if (card) { const im = card.querySelector('.item-thumb'); if (im) im.removeAttribute('src'); card.remove(); }
   const it = imageQueue.find(i => i.id === id);
   if (it) revokeItemUrls(it);
   imageQueue = imageQueue.filter(i => i.id !== id);
-  renderImageList();
-  if (!imageQueue.length) { $('btn_convert_all').disabled = true; $('btn_zip_all').style.display = 'none'; }
+  const hdr = $('img_list_header');
+  hdr.style.display = imageQueue.length ? 'flex' : 'none';
+  if (imageQueue.length) $('img_count_badge').textContent = `${imageQueue.length} 張`;
+  else { $('btn_convert_all').disabled = true; $('btn_imgs_to_pdf').disabled = true; $('btn_zip_all').style.display = 'none'; }
 }
 function clearImageList() {
   if (!imageQueue.length) return;
+  imgSessionId++;
+  thumbChain = Promise.resolve(); heicChain = Promise.resolve();
+  hideImgZoom(); closeCompareModal(); closeMobilePreview();
+  imgListEl.querySelectorAll('img').forEach(im => im.removeAttribute('src'));
   imageQueue.forEach(revokeItemUrls);
-  imageQueue = []; renderImageList();
-  $('btn_convert_all').disabled = true; $('btn_zip_all').style.display = 'none';
+  imageQueue = [];
+  imgListEl.replaceChildren();
+  $('img_list_header').style.display = 'none';
+  $('btn_convert_all').disabled = true; $('btn_imgs_to_pdf').disabled = true; $('btn_zip_all').style.display = 'none';
   showToast('已清空圖片清單');
 }
 
 async function processAllImages() {
+  const sid = imgSessionId;
   const mime = $('img_target_format').value, q = +$('img_quality_slider').value / 100, rm = $('img_resize_mode').value;
   const cw = parseInt($('custom_w').value) || null, ch = parseInt($('custom_h').value) || null;
   const btn = $('btn_convert_all'), strip = $('img_batch_progress'), bar = $('img_batch_bar'), pctEl = $('img_batch_pct'), lbl = $('img_batch_label');
@@ -1047,24 +1400,34 @@ async function processAllImages() {
   if (total > 1) { strip.classList.add('visible'); bar.style.width = '0%'; pctEl.textContent = '0%'; }
   let done = 0, saved = 0;
   for (let i = 0; i < total; i++) {
-    const item = imageQueue[i]; item.status = 'converting'; renderImageList();
+    if (sid !== imgSessionId) break;
+    const item = imageQueue[i];
+    if (!item || !item.file) continue;
+    item.status = 'converting'; updateImageCard(item);
     if (total > 1) lbl.textContent = `正在轉檔第 ${i + 1} / ${total} 張：${item.name}`;
     try {
       let src = item.file;
       if (item.isHeic && item.heicBlob) src = item.heicBlob;
-      else if (item.isHeic) { src = await heic2any({ blob: item.file, toType: 'image/jpeg', quality: .95 }); if (Array.isArray(src)) src = src[0]; if (!item.origPreviewUrl) item.origPreviewUrl = URL.createObjectURL(src); }
+      else if (item.isHeic) { src = await heic2any({ blob: item.file, toType: 'image/jpeg', quality: .95 }); if (Array.isArray(src)) src = src[0]; item.heicBlob = src; }
+      if (sid !== imgSessionId) break;
       const tb = getTargetBytes(item);
       const out = await convertImageBlob(src, mime, q, rm, cw, ch, isRatioLocked, tb);
-      if (item.previewUrl && item.previewUrl !== item.origPreviewUrl) URL.revokeObjectURL(item.previewUrl);
+      if (sid !== imgSessionId) break;
       item.targetBytes = tb; item.convertedBlob = out; item.convertedSize = out.size; item.outW = out.outW; item.outH = out.outH;
-      item.previewUrl = URL.createObjectURL(out); item.status = 'done'; done++; saved += Math.max(0, item.size - out.size);
+      try {
+        const r = await makeSmallThumb(out, 240);
+        if (sid !== imgSessionId) { URL.revokeObjectURL(r.url); break; }
+        if (item.thumbUrl) URL.revokeObjectURL(item.thumbUrl);
+        item.thumbUrl = r.url;
+      } catch (_) {}
+      item.status = 'done'; done++; saved += Math.max(0, item.size - out.size);
     } catch (e) { console.error('轉檔失敗:', item.name, e); item.status = 'error'; }
     if (total > 1) { const p = Math.round(((i + 1) / total) * 100); bar.style.width = p + '%'; pctEl.textContent = p + '%'; }
-    renderImageList();
+    updateImageCard(item);
   }
-  btn.disabled = false; btn.innerHTML = `${ICONS.bolt}<span>開始轉檔</span>`;
-  setTimeout(() => strip.classList.remove('visible'), 450);
-  if (done) { recordStats(done, saved); triggerAmbientPulse(); $('btn_zip_all').style.display = 'inline-flex'; showToast(`已完成 ${done} 張圖片轉檔`, true); }
+  btn.disabled = !imageQueue.length; btn.innerHTML = `${ICONS.bolt}<span>開始轉檔</span>`;
+  strip.classList.remove('visible');
+  if (done && sid === imgSessionId) { recordStats(done, saved); triggerAmbientPulse(); $('btn_zip_all').style.display = 'inline-flex'; showToast(`已完成 ${done} 張圖片轉檔`, true); }
 }
 
 function convertImageBlob(blob, mime, q, rm, cw, ch, lock, targetBytes) {
@@ -1080,36 +1443,42 @@ function convertImageBlob(blob, mime, q, rm, cw, ch, lock, targetBytes) {
       else if (rm === 'scale_75') { w = Math.round(w * .75); h = Math.round(h * .75); }
       else if (rm === 'scale_50') { w = Math.round(w * .5); h = Math.round(h * .5); }
       else if (rm !== 'original') { const mw = parseInt(rm); if (w > mw) { h = Math.round((h * mw) / w); w = mw; } }
+      const c = document.createElement('canvas');
       const render = sc => {
-        const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * sc)); c.height = Math.max(1, Math.round(h * sc));
+        c.width = Math.max(1, Math.round(w * sc)); c.height = Math.max(1, Math.round(h * sc));
         const x = c.getContext('2d');
         if (mime === 'image/jpeg') { x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); }
-        x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(img, 0, 0, c.width, c.height); return c;
+        x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(img, 0, 0, c.width, c.height);
+        return { ow: c.width, oh: c.height };
       };
-      const toB = (c, ql) => new Promise(r => c.toBlob(r, mime, ql));
-      const fin = (b, c) => { if (!b) return rej(new Error('Canvas 轉檔失敗')); b.outW = c.width; b.outH = c.height; res(b); };
+      const toB = ql => new Promise(r => c.toBlob(r, mime, ql));
+      const fin = (b, ow, oh) => { c.width = c.height = 0; if (!b) return rej(new Error('Canvas 轉檔失敗')); b.outW = ow; b.outH = oh; res(b); };
       try {
-        let c = render(1), best = await toB(c, q);
-        if (!targetBytes || best.size <= targetBytes) return fin(best, c);
+        let dims = render(1), best = await toB(q);
+        if (!targetBytes || best.size <= targetBytes) return fin(best, dims.ow, dims.oh);
         if (mime === 'image/png') {
-          let lo = .05, hi = 1, bc = null, bb = null;
-          for (let i = 0; i < 9; i++) { const mid = (lo + hi) / 2, cc = render(mid), b2 = await toB(cc, 1); if (b2.size <= targetBytes) { bc = cc; bb = b2; lo = mid; } else hi = mid; }
-          return bb ? fin(bb, bc) : fin(await toB(bc = render(.05), 1), bc);
+          let lo = .05, hi = 1, bb = null, bw = 0, bh = 0;
+          for (let i = 0; i < 9; i++) {
+            const mid = (lo + hi) / 2, d = render(mid), b2 = await toB(1);
+            if (b2.size <= targetBytes) { bb = b2; bw = d.ow; bh = d.oh; lo = mid; } else hi = mid;
+          }
+          if (bb) return fin(bb, bw, bh);
+          const dMin = render(.05); return fin(await toB(1), dMin.ow, dMin.oh);
         }
         const qMin = Math.min(.4, q);
         for (let sc = 1, rd = 0; rd < 14; rd++, sc *= .85) {
-          c = render(sc); const atMin = await toB(c, qMin);
+          dims = render(sc); const atMin = await toB(qMin);
           if (atMin.size <= targetBytes) {
             let lo = qMin, hi = q, b2 = atMin;
-            for (let i = 0; i < 7; i++) { const mid = (lo + hi) / 2, bb = await toB(c, mid); if (bb.size <= targetBytes) { b2 = bb; lo = mid; } else hi = mid; }
-            return fin(b2, c);
+            for (let i = 0; i < 7; i++) { const mid = (lo + hi) / 2, bb = await toB(mid); if (bb.size <= targetBytes) { b2 = bb; lo = mid; } else hi = mid; }
+            return fin(b2, dims.ow, dims.oh);
           }
-          if (sc <= .1) return fin(atMin, c);
+          if (sc <= .1) return fin(atMin, dims.ow, dims.oh);
         }
-        fin(await toB(c, qMin), c);
-      } catch (e) { rej(e); }
+        fin(await toB(qMin), dims.ow, dims.oh);
+      } catch (e) { c.width = c.height = 0; rej(e); }
     };
-    img.onerror = rej; img.src = u;
+    img.onerror = e => { URL.revokeObjectURL(u); rej(e); }; img.src = u;
   });
 }
 
@@ -1130,11 +1499,66 @@ async function downloadAllZip() {
   triggerDownload(await zip.generateAsync({ type: 'blob' }), `Converted_Images_${new Date().toISOString().slice(0, 10)}.zip`);
   showToast('ZIP 壓縮檔已開始下載', true);
 }
+async function exportImagesToPdf() {
+  if (!imageQueue.length) return showToast('請先加入圖片');
+  const btn = $('btn_imgs_to_pdf'), strip = $('img_batch_progress'), bar = $('img_batch_bar'), pctEl = $('img_batch_pct'), lbl = $('img_batch_label');
+  const origHtml = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span><span>合併中...</span>';
+  strip.classList.add('visible'); bar.style.width = '0%'; pctEl.textContent = '0%';
+  let cv = null;
+  try {
+    const out = await PDFLib.PDFDocument.create();
+    cv = document.createElement('canvas');
+    const ctx = cv.getContext('2d');
+    const total = imageQueue.length;
+    for (let i = 0; i < total; i++) {
+      const item = imageQueue[i];
+      lbl.textContent = `正在合併第 ${i + 1} / ${total} 張圖片：${item.name}`;
+      let src = item.convertedBlob || (item.isHeic ? item.heicBlob : item.file);
+      if (!src && item.isHeic) { src = await heic2any({ blob: item.file, toType: 'image/jpeg', quality: .92 }); if (Array.isArray(src)) src = src[0]; item.heicBlob = src; }
+      if (!src) continue;
+      let w = 0, h = 0;
+      if (typeof createImageBitmap === 'function') {
+        const bmp = await createImageBitmap(src);
+        w = bmp.width; h = bmp.height;
+        cv.width = w; cv.height = h;
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(bmp, 0, 0, w, h);
+        bmp.close();
+      } else {
+        await new Promise((res, rej) => {
+          const im = new Image(), u = URL.createObjectURL(src);
+          im.onload = () => { URL.revokeObjectURL(u); w = im.width; h = im.height; cv.width = w; cv.height = h; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(im, 0, 0, w, h); im.onload = im.onerror = null; im.removeAttribute('src'); res(); };
+          im.onerror = e => { URL.revokeObjectURL(u); rej(e); };
+          im.src = u;
+        });
+      }
+      const jpgBytes = dataUrlToU8(cv.toDataURL('image/jpeg', 0.92));
+      const embedded = await out.embedJpg(jpgBytes);
+      const maxPt = 842, sc = Math.min(1, maxPt / Math.max(w, h, 1));
+      const pw = Math.max(1, Math.round(w * sc)), ph = Math.max(1, Math.round(h * sc));
+      out.addPage([pw, ph]).drawImage(embedded, { x: 0, y: 0, width: pw, height: ph });
+      const p = Math.round(((i + 1) / total) * 92);
+      bar.style.width = p + '%'; pctEl.textContent = p + '%';
+      await new Promise(r => setTimeout(r, 0));
+    }
+    lbl.textContent = '封裝 PDF 檔案中...'; bar.style.width = '98%'; pctEl.textContent = '98%';
+    const bytes = await out.save();
+    triggerDownload(new Blob([bytes], { type: 'application/pdf' }), `QuC_Images_${new Date().toISOString().slice(0, 10)}.pdf`);
+    recordStats(total, 0); triggerAmbientPulse(); showToast(`已將 ${total} 張圖片合併為 PDF`, true);
+  } catch (e) { console.error('圖片合併 PDF 失敗:', e); showToast('合併失敗：' + e.message); }
+  finally {
+    if (cv) cv.width = cv.height = 0;
+    btn.disabled = !imageQueue.length; btn.innerHTML = origHtml;
+    strip.classList.remove('visible');
+  }
+}
 
 // [PDF-PAGES] 2000-Page Textbook Engine (Lazy IO + LRU Canvas Pool + Chunking + Batch Export)
 let pdfPagesList = [], sortableInstance = null, pdfChunkSize = 0, pdfChunkIdx = 0;
-const hqThumbCache = new Map(), liveThumbs = new Map(), visibleIds = new Set(), renderQueue = [];
-const MAX_LIVE_THUMBS = 72, MAX_CONCURRENT_RENDERS = 2;
+const hqThumbCache = new Map(), liveThumbs = new Map(), visibleIds = new Set(), renderQueue = [], loadedPdfDocs = new Set();
+const MAX_CONCURRENT_RENDERS = 2;
+const getMaxLiveThumbs = () => pdfPagesList.length > 200 ? 36 : 72;
 let activeRenders = 0;
 const pdfDropZone = $('pdf_drop_zone'), pdfFileInput = $('pdf_file_input'), pdfGrid = $('pdf_pages_grid');
 const zoomTooltip = $('pdf_zoom_tooltip'), zoomCanvas = $('pdf_zoom_canvas'), zoomLabel = $('pdf_zoom_label');
@@ -1164,6 +1588,7 @@ function pumpThumbQueue() {
         if (!pv) return;
         const page = await p.pdfDoc.getPage(p.pageIndex + 1);
         const c = await renderThumb(page, p.rotation);
+        page.cleanup();
         if (!pv.isConnected) { c.width = c.height = 0; return; }
         p.canvasThumb = p._thumbEl = c;
         pv.querySelector('.page-placeholder')?.remove();
@@ -1182,9 +1607,10 @@ function releaseThumb(p) {
   liveThumbs.delete(p.id);
 }
 function evictOldThumbs() {
-  if (liveThumbs.size <= MAX_LIVE_THUMBS) return;
+  const cap = getMaxLiveThumbs();
+  if (liveThumbs.size <= cap) return;
   for (const [id, p] of liveThumbs) {
-    if (liveThumbs.size <= MAX_LIVE_THUMBS) break;
+    if (liveThumbs.size <= cap) break;
     if (visibleIds.has(id)) continue;
     const pv = pdfGrid.querySelector(`.page-preview[data-pid="${id}"]`);
     releaseThumb(p);
@@ -1200,9 +1626,14 @@ function evictOldThumbs() {
 pdfDropZone.addEventListener('drop', async e => { const fs = Array.from(e.dataTransfer.files).filter(f => /\.pdf$/i.test(f.name)); if (fs.length) { await loadInitialPdf(fs[0]); if (fs.length > 1) await appendPdfFiles(fs.slice(1)); } });
 pdfFileInput.addEventListener('change', async e => { const fs = Array.from(e.target.files); pdfFileInput.value = ''; if (fs.length) { await loadInitialPdf(fs[0]); if (fs.length > 1) await appendPdfFiles(fs.slice(1)); } });
 
+function destroyPdfDocs() {
+  loadedPdfDocs.forEach(d => { try { d.cleanup?.(); } catch (_) {} try { d.destroy(); } catch (_) {} });
+  loadedPdfDocs.clear();
+}
 async function loadInitialPdf(file) {
   liveThumbs.forEach(releaseThumb); liveThumbs.clear(); visibleIds.clear(); renderQueue.length = 0;
-  pdfPagesList = []; hqThumbCache.clear(); pdfChunkIdx = 0; pdfChunkSize = 0;
+  hqThumbCache.forEach(c => { c.width = c.height = 0; }); hqThumbCache.clear();
+  destroyPdfDocs(); pdfPagesList = []; pdfChunkIdx = 0; pdfChunkSize = 0;
   await appendPdfFile(file);
   $('pdf_ctrl_bar').style.display = 'flex';
   $('pdf_power_bar').style.display = 'flex';
@@ -1211,10 +1642,10 @@ async function loadInitialPdf(file) {
 }
 async function appendPdfFiles(list) { $('pdf_append_input').value = ''; for (const f of Array.from(list)) await appendPdfFile(f); }
 async function appendPdfFile(file) {
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const doc = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+  loadedPdfDocs.add(doc);
   for (let i = 1; i <= doc.numPages; i++) {
-    pdfPagesList.push({ id: 'p_' + Math.random().toString(36).slice(2, 10), srcPdfBytes: bytes, pageIndex: i - 1, rotation: 0, canvasThumb: null, _thumbEl: null, _queued: false, sourceFileName: file.name, pageNum: i, pdfDoc: doc });
+    pdfPagesList.push({ id: 'p_' + Math.random().toString(36).slice(2, 10), srcFile: file, pageIndex: i - 1, rotation: 0, canvasThumb: null, _thumbEl: null, _queued: false, sourceFileName: file.name, pageNum: i, pdfDoc: doc });
   }
   if (pdfPagesList.length > 150 && pdfChunkSize === 0) pdfChunkSize = 100;
   renderPdfGrid(); triggerAmbientPulse(); showToast(`秒開載入 ${file.name}（共 ${doc.numPages} 頁）`, true);
@@ -1251,7 +1682,8 @@ function stepPdfChunk(delta) {
 function initSortable() {
   if (sortableInstance) sortableInstance.destroy();
   sortableInstance = new Sortable(pdfGrid, {
-    animation: 180, ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
+    animation: 180, delay: 180, delayOnTouchOnly: true, touchStartThreshold: 6,
+    ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
     onEnd: e => {
       const [start] = getChunkRange();
       pdfPagesList.splice(start + e.newIndex, 0, pdfPagesList.splice(start + e.oldIndex, 1)[0]);
@@ -1340,28 +1772,28 @@ async function exportRangePdf() {
   await exportPdfPages(idxs.map(i => pdfPagesList[i]), `Extract_${idxs.length}p_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
-let zoomToken = 0, activeZoomId = null, zoomMouse = { x: 0, y: 0 }, zoomRaf = 0;
+let zoomToken = 0, activeZoomId = null, activeZoomRect = null;
 pdfGrid.addEventListener('mouseover', e => {
+  if (!canHover()) return;
   const pv = e.target.closest('.page-preview');
   if (!pv || pv.dataset.pid === activeZoomId) return;
   const p = pdfPagesList.find(i => i.id === pv.dataset.pid);
-  if (p) { activeZoomId = p.id; zoomMouse.x = e.clientX; zoomMouse.y = e.clientY; showZoomTooltip(p, e.clientX, e.clientY); }
+  if (p) { activeZoomId = p.id; activeZoomRect = pv.getBoundingClientRect(); showZoomTooltip(p, activeZoomRect); }
 });
-pdfGrid.addEventListener('mousemove', e => {
-  if (!activeZoomId) return;
-  zoomMouse.x = e.clientX; zoomMouse.y = e.clientY;
-  if (!zoomTooltip.classList.contains('visible') || zoomRaf) return;
-  zoomRaf = requestAnimationFrame(() => { zoomRaf = 0; if (activeZoomId) positionFloatingPreview(zoomTooltip, zoomMouse.x, zoomMouse.y); });
-}, { passive: true });
 pdfGrid.addEventListener('mouseout', e => {
   const pv = e.target.closest('.page-preview');
   if (pv && !pv.contains(e.relatedTarget)) hideZoomTooltip();
 });
-addEventListener('scroll', () => { if (activeZoomId && zoomTooltip.classList.contains('visible')) positionFloatingPreview(zoomTooltip, zoomMouse.x, zoomMouse.y); }, { passive: true });
+pdfGrid.addEventListener('click', e => {
+  if (canHover()) return;
+  const pv = e.target.closest('.page-preview');
+  if (pv) { const p = pdfPagesList.find(i => i.id === pv.dataset.pid); if (p) openMobilePdfPreview(p); }
+});
+addEventListener('scroll', () => { if (activeZoomId && zoomTooltip.classList.contains('visible')) positionFloatingPreview(zoomTooltip, activeZoomRect); }, { passive: true });
 
-async function showZoomTooltip(p, cx, cy) {
+async function showZoomTooltip(p, anchorRect) {
   const tok = ++zoomToken, dpr = Math.min(devicePixelRatio || 1, 2);
-  const maxW = Math.min(innerWidth * .44, 780), maxH = innerHeight * .82 - 44;
+  const maxW = Math.min(innerWidth * .28, 412), maxH = Math.min(innerHeight * .38, 336);
   const page = await p.pdfDoc.getPage(p.pageIndex + 1);
   if (tok !== zoomToken) return;
   const rot = ((page.rotate || 0) + p.rotation) % 360;
@@ -1374,8 +1806,9 @@ async function showZoomTooltip(p, cx, cy) {
     hq = document.createElement('canvas'); hq.width = Math.floor(vp.width); hq.height = Math.floor(vp.height);
     const ctx = hq.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, hq.width, hq.height);
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    page.cleanup();
     hqThumbCache.set(key, hq);
-    if (hqThumbCache.size > 10) { const fk = hqThumbCache.keys().next().value; const old = hqThumbCache.get(fk); if (old) old.width = old.height = 0; hqThumbCache.delete(fk); }
+    if (hqThumbCache.size > 4) { const fk = hqThumbCache.keys().next().value; const old = hqThumbCache.get(fk); if (old) old.width = old.height = 0; hqThumbCache.delete(fk); }
   }
   if (tok !== zoomToken) return;
   zoomCanvas.width = hq.width; zoomCanvas.height = hq.height;
@@ -1383,9 +1816,9 @@ async function showZoomTooltip(p, cx, cy) {
   zoomCanvas.getContext('2d').drawImage(hq, 0, 0);
   zoomLabel.textContent = `第 ${p.pageNum} 頁 · ${p.sourceFileName}`;
   zoomTooltip.classList.add('visible');
-  positionFloatingPreview(zoomTooltip, zoomMouse.x || cx, zoomMouse.y || cy);
+  positionFloatingPreview(zoomTooltip, anchorRect);
 }
-function hideZoomTooltip() { zoomToken++; activeZoomId = null; zoomTooltip.classList.remove('visible'); }
+function hideZoomTooltip() { zoomToken++; activeZoomId = null; activeZoomRect = null; zoomTooltip.classList.remove('visible'); zoomCanvas.width = zoomCanvas.height = 0; zoomCanvas.style.width = zoomCanvas.style.height = ''; }
 
 function updatePageNumbers() {
   const [start, end] = getChunkRange();
@@ -1394,7 +1827,9 @@ function updatePageNumbers() {
 }
 async function applyRotation(p) {
   if (!p._thumbEl?.parentNode) return;
-  const c = await renderThumb(await p.pdfDoc.getPage(p.pageIndex + 1), p.rotation);
+  const page = await p.pdfDoc.getPage(p.pageIndex + 1);
+  const c = await renderThumb(page, p.rotation);
+  page.cleanup();
   p._thumbEl.width = p._thumbEl.height = 0;
   p._thumbEl.replaceWith(c); p._thumbEl = p.canvasThumb = c;
 }
@@ -1412,15 +1847,66 @@ function deletePage(id) {
   if (pdfChunkSize > 0) renderPdfGrid(); else { $(id)?.remove(); updatePageNumbers(); }
 }
 function resetPdfStudio() {
-  thumbObserver.disconnect(); liveThumbs.forEach(releaseThumb); liveThumbs.clear(); visibleIds.clear(); renderQueue.length = 0;
+  thumbObserver.disconnect();
+  if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
+  pdfGrid.querySelectorAll('canvas').forEach(c => { c.width = c.height = 0; });
+  liveThumbs.forEach(releaseThumb); liveThumbs.clear(); visibleIds.clear(); renderQueue.length = 0;
   hqThumbCache.forEach(c => { c.width = c.height = 0; }); hqThumbCache.clear();
-  pdfPagesList = []; pdfGrid.innerHTML = '';
+  pdfPagesList.forEach(p => { p.srcFile = p.pdfDoc = p.canvasThumb = p._thumbEl = null; });
+  destroyPdfDocs(); pdfPagesList = []; pdfGrid.replaceChildren();
   $('pdf_ctrl_bar').style.display = $('pdf_power_bar').style.display = 'none';
-  hideZoomTooltip(); showToast('已重置 PDF 編排工作台');
+  hideZoomTooltip(); closeMobilePreview(); showToast('已重置 PDF 編排工作台');
 }
 async function exportEditedPdf() {
   if (!pdfPagesList.length) return showToast('目前沒有任何頁面可匯出');
   await exportPdfPages(pdfPagesList, `Reordered_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+async function exportPdfToImagesZip() {
+  if (!pdfPagesList.length) return showToast('目前沒有任何頁面可匯出');
+  const btn = $('btn_export_pdf_imgs'), strip = $('pdf_export_progress'), bar = $('pdf_export_bar'), pctEl = $('pdf_export_pct'), lbl = $('pdf_export_label');
+  const origHtml = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span><span>渲染中...</span>';
+  strip.classList.add('visible'); bar.style.width = '0%'; pctEl.textContent = '0%';
+  let cv = null;
+  try {
+    const total = pdfPagesList.length;
+    cv = document.createElement('canvas');
+    const ctx = cv.getContext('2d');
+    const zip = total > 1 ? new JSZip() : null;
+    let singleBlob = null;
+    for (let i = 0; i < total; i++) {
+      const p = pdfPagesList[i];
+      lbl.textContent = `渲染圖片中：第 ${i + 1} / ${total} 頁`;
+      const page = await p.pdfDoc.getPage(p.pageIndex + 1);
+      const rot = ((page.rotate || 0) + p.rotation) % 360;
+      const vp = page.getViewport({ scale: 2, rotation: rot });
+      cv.width = Math.floor(vp.width); cv.height = Math.floor(vp.height);
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      page.cleanup();
+      const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.92));
+      const pad = String(i + 1).padStart(3, '0');
+      if (zip) zip.file(`Page_${pad}.jpg`, blob);
+      else singleBlob = blob;
+      const pct = Math.round(((i + 1) / total) * 92);
+      bar.style.width = pct + '%'; pctEl.textContent = pct + '%';
+      await new Promise(r => setTimeout(r, 0));
+    }
+    if (zip) {
+      lbl.textContent = '打包 ZIP 壓縮檔中...'; bar.style.width = '98%'; pctEl.textContent = '98%';
+      triggerDownload(await zip.generateAsync({ type: 'blob' }), `QuC_PDF_Images_${new Date().toISOString().slice(0, 10)}.zip`);
+      showToast(`已將 ${total} 頁 PDF 匯出為圖片 ZIP`, true);
+    } else if (singleBlob) {
+      triggerDownload(singleBlob, `Page_001.jpg`);
+      showToast('已匯出高畫質圖片', true);
+    }
+    recordStats(1, 0); triggerAmbientPulse();
+  } catch (e) { console.error('PDF 轉圖片失敗:', e); showToast('匯出失敗：' + e.message); }
+  finally {
+    if (cv) cv.width = cv.height = 0;
+    btn.disabled = false; btn.innerHTML = origHtml;
+    strip.classList.remove('visible');
+  }
 }
 async function exportPdfPages(pages, filename) {
   const btn = $('btn_export_pdf'), strip = $('pdf_export_progress'), bar = $('pdf_export_bar'), pctEl = $('pdf_export_pct'), lbl = $('pdf_export_label');
@@ -1429,10 +1915,10 @@ async function exportPdfPages(pages, filename) {
   try {
     const out = await PDFLib.PDFDocument.create(), cache = new Map(), total = pages.length, BATCH = 40;
     for (let i = 0; i < total; ) {
-      const refBytes = pages[i].srcPdfBytes, batch = [];
-      while (i < total && batch.length < BATCH && pages[i].srcPdfBytes === refBytes) batch.push(pages[i++]);
-      let src = cache.get(refBytes);
-      if (!src) { src = await PDFLib.PDFDocument.load(refBytes); cache.set(refBytes, src); }
+      const refFile = pages[i].srcFile, batch = [];
+      while (i < total && batch.length < BATCH && pages[i].srcFile === refFile) batch.push(pages[i++]);
+      let src = cache.get(refFile);
+      if (!src) { src = await PDFLib.PDFDocument.load(await refFile.arrayBuffer()); cache.set(refFile, src); }
       const copied = await out.copyPages(src, batch.map(p => p.pageIndex));
       copied.forEach((cp, idx) => {
         const rot = batch[idx].rotation;
@@ -1449,7 +1935,7 @@ async function exportPdfPages(pages, filename) {
     triggerDownload(new Blob([bytes], { type: 'application/pdf' }), filename);
     recordStats(1, 0); triggerAmbientPulse(); showToast(`PDF 匯出成功（共 ${total} 頁）`, true);
   } catch (e) { console.error('PDF 匯出失敗:', e); showToast('匯出失敗：' + e.message); }
-  finally { btn.disabled = false; btn.innerHTML = `${ICONS.dl}<span>匯出 PDF</span>`; setTimeout(() => strip.classList.remove('visible'), 500); }
+  finally { btn.disabled = false; btn.innerHTML = `${ICONS.dl}<span>匯出 PDF</span>`; strip.classList.remove('visible'); }
 }
 
 // [PDF-COMPRESS] Re-sampling Compressor
@@ -1461,6 +1947,7 @@ compressDropZone.addEventListener('drop', e => { if (e.dataTransfer.files.length
 compressInput.addEventListener('change', e => { if (e.target.files.length) loadCompressPdf(e.target.files[0]); compressInput.value = ''; });
 
 function loadCompressPdf(file) {
+  if (lastCompressedUrl) { URL.revokeObjectURL(lastCompressedUrl); lastCompressedUrl = ''; }
   targetCompressFile = file; $('pdf_compress_ctrl').style.display = 'flex';
   $('compress_info').textContent = `${file.name} · 原始大小 ${formatSize(file.size)}`;
   $('compress_result_card').style.display = $('compress_progress_box').style.display = 'none';
@@ -1472,15 +1959,19 @@ async function startPdfCompression() {
   const [dpi, q] = prof === 'balanced' ? [1.25, .78] : prof === 'print' ? [1.6, .88] : [.9, .6];
   const box = $('compress_progress_box'), bar = $('compress_progress_bar'), pctEl = $('compress_percent_text'), stEl = $('compress_status_text'), btn = $('btn_start_pdf_compress');
   box.style.display = 'flex'; btn.disabled = true; $('compress_result_card').style.display = 'none';
+  let doc = null, cv = null;
   try {
-    const doc = await pdfjsLib.getDocument({ data: new Uint8Array(await targetCompressFile.arrayBuffer()) }).promise;
-    const out = await PDFLib.PDFDocument.create(), cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+    doc = await pdfjsLib.getDocument({ data: new Uint8Array(await targetCompressFile.arrayBuffer()) }).promise;
+    const out = await PDFLib.PDFDocument.create();
+    cv = document.createElement('canvas');
+    const ctx = cv.getContext('2d');
     for (let i = 1; i <= doc.numPages; i++) {
       const pct = Math.round((i / doc.numPages) * 100);
       bar.style.width = pct + '%'; pctEl.textContent = pct + '%'; stEl.textContent = `重新渲染壓縮第 ${i} / ${doc.numPages} 頁...`;
       const page = await doc.getPage(i), vp = page.getViewport({ scale: dpi }), orig = page.getViewport({ scale: 1 });
       cv.width = vp.width; cv.height = vp.height; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
       await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      page.cleanup();
       const img = await out.embedJpg(dataUrlToU8(cv.toDataURL('image/jpeg', q)));
       out.addPage([orig.width, orig.height]).drawImage(img, { x: 0, y: 0, width: orig.width, height: orig.height });
     }
@@ -1496,7 +1987,11 @@ async function startPdfCompression() {
     const dl = $('btn_download_compressed_pdf'); dl.href = lastCompressedUrl; dl.download = `Compressed_${targetCompressFile.name}`;
     recordStats(1, Math.max(0, origSz - newSz)); triggerAmbientPulse(); showToast(`PDF 瘦身完成，節省 ${ratio}%`, true);
   } catch (e) { console.error('壓縮失敗:', e); showToast('壓縮失敗：' + e.message); }
-  finally { btn.disabled = false; box.style.display = 'none'; }
+  finally {
+    if (cv) cv.width = cv.height = 0;
+    if (doc) { try { doc.destroy(); } catch (_) {} }
+    btn.disabled = false; box.style.display = 'none';
+  }
 }
 
 // [UTILS]
