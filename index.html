@@ -279,8 +279,8 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.16)}
 /* FLOATING ZOOM LOUPE (VIEWPORT-FOLLOWING, CLEAN HEADER) */
 .pdf-zoom-tooltip{display:none;position:fixed;left:0;top:0;z-index:9999;pointer-events:none;background:var(--glass-strong);backdrop-filter:saturate(180%) blur(28px);-webkit-backdrop-filter:saturate(180%) blur(28px);border:1px solid var(--b2);border-radius:16px;padding:10px 12px 12px;box-shadow:var(--sh-float);overflow:hidden;will-change:transform,opacity;transition:opacity .15s var(--ease);opacity:0}
 .pdf-zoom-tooltip.visible{display:block;opacity:1}
-.loupe-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;padding:0 2px}
-.pdf-zoom-label{font-size:11.5px;color:var(--t2);font-weight:600;letter-spacing:-.01em}
+.loupe-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:0 2px;width:0;min-width:100%}
+.pdf-zoom-label{font-size:11.5px;color:var(--t2);font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
 .pdf-zoom-tooltip canvas{display:block;border-radius:9px;background:#fff}
 #img_zoom_tooltip img{display:block;border-radius:9px;background:repeating-conic-gradient(var(--chk1) 0% 25%,var(--chk2) 0% 50%) 50%/16px 16px}
 
